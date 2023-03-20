@@ -10,48 +10,56 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import *as UserApi from '../../api/UserRequests.js'
-const Form = () => {
+import { uploadImage } from "../../actions/UploadActions";
+const Form = (modalOpened,setModelOpened,data) => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
-  const dispatch = useDispatch()
-  const params = useParams()
-//déclaration profile userId
-const profileUserId = params.id;
-//fetch globale state user
-const [profileUser, setProfileUser] = useState({});
-  //const { user } = useSelector((state) => state.authReducer.authData);
 
-  // useEffect(()=>{
-  //   const fetchProfileUser =async()=>{ 
-  //     if(profileUserId === user._id){
-  //       setProfileUser(user)
-  //       console.log(user)
-  //     }
-  //     else{
-  //       //get userId from the database
-  //       const profileUser= await UserApi.getUser(profileUserId)
-  //       setProfileUser(profileUser)
-  //       console.log(profileUser)
-  //     }
-  //   }
+  const[formData,setFormData]=useState()
+  const[profileImage,setProfileImage]=useState(null)
+  const dispatch =useDispatch()
+  const param =useParams()
+  //import user from the dataBase
+ const user=useSelector((state)=>state.authReducer.authData)
 
-  //   //on a ajouter [user] pour stoper la boucle infini 
-  //   fetchProfileUser()
-  // },[user])
+ const handleChange =(e)=>{
+  setFormData({...formData,[e.target.name]:e.target.value})
+ }
 
+ const onImageChange =(event)=>{
+  if(event.target.files && event.target.files[0] ){
+    let img=event.target.files[0];
+    event.target.name ==="image" 
+     setProfileImage(img)
 
+   }
+ }
+ 
 
 
   const handleFormSubmit=(values)=>{
     console.log(values);
-  }
+  }  
  
-  const initialValues = {
-    username: "",
-    prenom: "",
-    telephone: "",
-    email: "",
-    address: "",
-  };
+  const handleSbmit =(e)=>{
+  e.preventDefault();
+  let UserData=formData;
+  if(profileImage){
+    const data = new FormData();
+    const fileName=Data.now()+profileImage.name;
+    data.append("name",fileName);
+    data.appand("file",profileImage)
+    UserData.image=fileName;
+     try {
+      dispatch(uploadImage(data))
+     } catch (error) {
+      console.log(error)
+      
+     }
+  }
+  dispatch(UserApi.updateUser(param.id,UserData))
+  setModelOpened(false)
+  }
+
   return(
     <div  className="app">
     <Sidebar/> 
@@ -70,7 +78,6 @@ const [profileUser, setProfileUser] = useState({});
       errors,
       touched,
       handleBlur,
-      handleChange,
       handleSubmit,
     })=>(
         <form onSubmit={handleSubmit}>
@@ -90,34 +97,34 @@ const [profileUser, setProfileUser] = useState({});
                 label="Nom"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={values.username }
-                name="username"
-                error={!!touched.username && !!errors.username}
-                helperText={touched.username && errors.username}
+                value={formData.name}
+                name="name"
+                error={!!touched.name && !!errors.name}
+                helperText={touched.name && errors.name}
                  sx={{gridColumn:"span 2"}}
                  />
                 <TextField
                 fullWidth
                 variant="filled"
                 type="text"
-                label="Prénom"
+                label="email"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={values.prenom}
-                name="prenom"
-                error={!!touched.prenom && !!errors.prenom}
-                helperText={touched.prenom && errors.prenom}
+                value={formData.email}
+                name="email"
+                error={!!touched.email && !!errors.email}
+                helperText={touched.email && errors.email}
                 sx={{ gridColumn: "span 2" }}
               />
 
-<TextField
+               <TextField
                 fullWidth
                 variant="filled"
                 type="text"
                 label="Numéro téléphone"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={values.telephone}
+                value={formData.telephone}
                 name="telephone"
                 error={!!touched.telephone && !!errors.telephone}
                 helperText={touched.telephone && errors.telephone}
@@ -130,7 +137,7 @@ const [profileUser, setProfileUser] = useState({});
                 label="Email"
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={values.email}
+                value={formData.email}
                 name="email"
                 error={!!touched.email && !!errors.email}
                 helperText={touched.email && errors.email}
@@ -141,20 +148,43 @@ const [profileUser, setProfileUser] = useState({});
                 fullWidth
                 variant="filled"
                 type="text"
-                label="Address "
+                label="adresse "
                 onBlur={handleBlur}
                 onChange={handleChange}
-                value={values.address}
-                name="address"
-                error={!!touched.address && !!errors.address}
-                helperText={touched.address && errors.address}
+                value={formData.adresse}
+                name="adresse"
+                error={!!touched.adresse && !!errors.adresse}
+                helperText={touched.adresse && errors.adresse}
                 sx={{ gridColumn: "span 4" }}
               />
-
+               
+               <TextField
+                fullWidth
+                variant="filled"
+                type="text"
+                label="description "
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={formData.description}
+                name="description"
+                error={!!touched.description && !!errors.description}
+                helperText={touched.description && errors.description}
+                sx={{ gridColumn: "span 4" }}
+              />
+              <b>Profile Image</b>
+               <TextField
+                type="file"
+                name="image"
+                onChange={onImageChange}
+                error={!!touched.image && !!errors.image}
+                helperText={touched.image && errors.image}
+                sx={{ gridColumn: "span 4" }}
+              
+              />
             </Box>
             <Box display="flex" justifyContent="end" mt="20px">
-            <Button type="submit" color="secondary" variant="contained">
-                Update User
+            <Button type="submit" color="secondary" onClick={handleSbmit}>
+                Modifier tous
             </Button>
             </Box>
         </form>
@@ -173,8 +203,8 @@ const phoneRegExp=
 
 
    const checkoutSchema=yup.object().shape({
-    username: yup.string().required("required"),
-    prenom: yup.string().required("required"),
+    name: yup.string().required("required"),
+    description: yup.string().required("required"),
     email:yup.string().email("invalid email").required("required"),
     telephone : yup
     .string()

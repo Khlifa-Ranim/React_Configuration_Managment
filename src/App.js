@@ -1,7 +1,7 @@
 
 import { ColorModeContext, useMode } from "./theme";
 import { CssBaseline,ThemeProvider } from "@mui/material";
-import {Routes,Route} from 'react-router-dom'
+import {Routes,Route,Navigate} from 'react-router-dom'
 import Dashboard from "./scences/dashboard/index"
 import Team from "./scences/team/index"
 import Contacts from "./scences/contacts/contacts"
@@ -13,8 +13,9 @@ import Bar from "./scences/bar/bar"
 import Pie from "./scences/pie/pie" 
 import Line from "./scences/line/line" 
 import Geography from "./scences/geography/geography" 
-import Auth from "./scences/Auth/Auth";
 import UserCreate from "./scences/createUser/CreateUser";
+import { useSelector } from "react-redux";
+import LoginPage from "./scences/Auth/Autth";
 
 
 
@@ -23,6 +24,8 @@ import UserCreate from "./scences/createUser/CreateUser";
 
 function App() {
   const [theme, colorMode] = useMode();  
+  //test if  the user is available
+  //const user = useSelector((state) => state.authReducer.authData);
   
   return (
 
@@ -32,8 +35,17 @@ function App() {
        <ThemeProvider theme={theme}>
         <CssBaseline/>
          <Routes>
-         <Route path="/auth"  element={<Auth/>}/>
-         <Route path="/profileCreate"  element={<UserCreate/>}/>
+         <Route path="/auth"  element={<LoginPage/>}/>
+
+
+{/* if the user available  then go to page dashboard else to authentification page */}
+
+         {/* <Route
+          path="/auth"
+          element={user ? <Navigate to="dashboard" /> : <Navigate to="auth" />}
+        />      */} 
+        
+          <Route path="/profileCreate"  element={<UserCreate/>}/>
           <Route path="/"  element={<Dashboard/>}/>
           <Route path="/team"  element={<Team/>}/>
           <Route path="/contacts"  element={<Contacts/>}/>

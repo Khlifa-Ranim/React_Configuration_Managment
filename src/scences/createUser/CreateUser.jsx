@@ -1,13 +1,91 @@
 import React, { useState } from "react";
+import * as yup from "yup";
 import "./CreateUser.css"
 import styled from "styled-components";
 import Input from '../../components/Input'
 import Button from '../../components/Button'
 import { height } from "@mui/system";
+import { useDispatch } from "react-redux";
+import { Formik } from "formik";
+import { CreateProfile } from "../../actions/UserActions";
 
 const CreateUser = () => {    
-    const [profileImg, setProfileImg] = useState([]);
+  const [profileImg, setProfileImg] = useState([]);
+  {/*constante pour controller la validité de conformepassword */}
 
+  const dispatch=useDispatch()
+  const [data ,setData]=useState({
+    name: "",
+    prenom: "",
+    telephone: "",
+    email: "",
+    adresse: "",
+    description:"",
+  })
+
+  {/*pour enregistrer les information dans ecrite les inputs */}
+  const handleChange=(e)=>{
+    // name:name dans les inputs et value:values dans input
+    setData({...data,[e.target.name]: e.target.value})
+   // console.log(data.name)
+    }
+   
+  const handleFormSubmit=(values)=>{
+    console.log(values);
+  }
+
+   {/*permet de submit our form to the backend serveur*/}
+  const handleSubmit=(e)=>{
+    //on prenant le département par défaut
+    e.preventDefault();
+
+     {/*useDispatch to interact with the action */}
+    {/*sending the data */}
+    dispatch(CreateProfile(data))
+
+  }
+
+  
+
+
+    {/*por retourner le form a l'état initial */}
+  const restForm=()=>{
+  setData(
+{
+  name: "",
+  prenom: "",
+  telephone: "",
+  email: "",
+  adresse: "",
+  description:"",
+}
+  )
+ } 
+
+   const initialValues = {
+    name: "",
+    prenom: "",
+    telephone: "",
+    email: "",
+    adresse: "",
+    description:"",
+  };
+
+  const phoneRegExp=
+   /^((\+[1-9]{1,4}[ -]?)|(\([0-9]{2,3}\)[ -]?)|([0-9]{2,4})[ -]?)*?[0-9]{3,4}[ -]?[0-9]{3,4}$/;
+
+
+
+   const checkoutSchema=yup.object().shape({
+    username: yup.string().required("required"),
+    prenom: yup.string().required("required"),
+    email:yup.string().email("invalid email").required("required"),
+    telephone : yup
+    .string()
+    .matches(phoneRegExp,"phone number is not valid")
+    .required("required"),
+    address: yup.string().required("required"),
+})
 
     
 
@@ -24,84 +102,140 @@ const CreateUser = () => {
     })
  } */
 
- function imageHandler (e)  {
-    const reader = new FileReader();
-    reader.onload = () =>{
-      if(reader.readyState === 2){
-       setProfileImg({profileImg: reader.result})
-      }
-    }
-    reader.readAsDataURL(e.target.files[0])
+ const imageHandler = (e) => {
+  const reader = new FileReader();
+  reader.onload = () => {
+    setProfileImg(reader.result);
+    console.log(reader.result)
   };
+  reader.readAsDataURL(e.target.files[0]);
+};
+
 
   return (<>
   <div className="body">
-    <MainContainer >
-      <WelcomeText>Créer Un Profile</WelcomeText>
-       <InputContainer>
+  <Formik
+   onSubmit={handleFormSubmit}
+   initialValues={initialValues}
+   validationSchema={checkoutSchema}
+  >
+     
+  {({
+      errors,
+      touched,
+      handleBlur,
+    })=>(   
+<form className="MainContainer" onSubmit={handleSubmit}>
 
+<WelcomeText>Créer Un Profile</WelcomeText>
+       <InputContainer>
        <img
-  style={{
-    width:"200px",
-    height:"100px",
-    borderRadius:"50%",
-    objectFit:"cover",
-  }}
+            style={{
+             width:"200px",
+             height:"100px",
+              borderRadius:"50%",
+              objectFit:"cover",
+             }}
   src={profileImg}
+
   alt=""
   id="img"
 />
          <Input
           type="text"
           placeholder="Entrer votre Nom"
-          required
+          name="name"
+          onChange={handleChange}
+          value={data.name}
+          error={!!touched.name && !!errors.name}
+          helperText={touched.name && errors.name}
+           sx={{gridColumn:"span 2"}}
+          
        />
 
         <Input
           type="text"
-          placeholder="Entrer votre Prénom"
-          required
+          placeholder="Entrer votre Adresse email"
+          value={data.email}
+          onChange={handleChange}
+          name="email"
+          error={!!touched.email && !!errors.email}
+          helperText={touched.email && errors.email}
+          sx={{ gridColumn: "span 4" }}
         />
         <Input
           type="text"
           placeholder="Entrer votre Téléphone"
           required
+          value={data.telephone}
+          onChange={handleChange}
+          name="telephone"
+          error={!!touched.telephone && !!errors.telephone}
+          helperText={touched.telephone && errors.telephone}
+          sx={{ gridColumn: "span 4" }}
         />
         <Input
           type="text"
-          placeholder="Entrer votre Email"
+          placeholder="Entrer votre Addresse"
           required
+          onChange={handleChange}
+          value={data.adresse}
+          name="adresse"
+          error={!!touched.adresse && !!errors.adresse}
+          helperText={touched.adresse && errors.adresse}
         />
          <Input
           type="text"
-          placeholder="Entrer votre Adresse"
+          placeholder="Description"
           required
+          onChange={handleChange}
+          value={data.description}
+          name="description"
+          error={!!touched.description && !!errors.description}
+          helperText={touched.description && errors.description}
         />
-        
-         <input
+          <input
+          type="file"
+          name="image"
+          accept="image/*"
+          id="input"
+          onChange={imageHandler}
+         // className="material-icons"
+         style={{
+          display:"none"
+          }}
+          required
+        />  
+  
+         <div className="label">
+         <label className="image-upload" htmlFor="input">
+         {/* <input
           type="file"
           name="image"
           onChange={imageHandler}
           accept="image/*"
           id="input"
+          className="material-icons"
           required
-        /> 
-     <div className="label">
-         <label className="image-upload" htmlFor="input">
+        />  */}
 			    <i className="material-icons">add_photo_alternate</i>
 			    Choisir Votre Profile
 	      </label>
-
         </div>
-      </InputContainer>
 
-      <HorizontalRule />
-
+       
+        </InputContainer>
+        <HorizontalRule />
+      
       <ButtonContainer>
         <Button content="Connexion" />
       </ButtonContainer> 
+        </form>)}
+      
 
-    </MainContainer>
+     
+
+        </Formik>
     </div>
   </>
   );
@@ -110,49 +244,7 @@ const CreateUser = () => {
 
 
 
-const MainContainer = styled.div`
-display: flex;
-align-items: center;
-flex-direction: column;
-height:90vh;
-width: 30vw;
-background: rgba(255, 255, 255, 0.15);
-box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-backdrop-filter: blur(8.5px);
--webkit-backdrop-filter: blur(8.5px);
-border-radius: 10px;
-color: #ffffff;
-text-transform: uppercase;
-letter-spacing: 0.4rem;
 
-
-@media only screen and (min-width: 360px) {
-  width: 80vw;
-  height: 90vh;
-
-  h4 {
-    font-size: small;
-  }
-}
-@media only screen and (min-width: 411px) {
-  width: 80vw;
-  height: 90vh;
-}
-
-@media only screen and (min-width: 768px) {
-  width: 80vw;
-  height: 80vh;
-}
-@media only screen and (min-width: 1024px) {
-  width: 70vw;
-  height: 50vh;
-}
-@media only screen and (min-width: 1280px) {
-  width: 30vw;
-  height: 80vh;
-}
-
-`;
 
 
 const WelcomeText = styled.h2`

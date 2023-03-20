@@ -135,21 +135,21 @@ const[selected,setSelected]=useState("Dashboard")
                  Data
                 </Typography>
                 <Item
-                title="Manage Team"
+                title=" Gestion des Utilisateurs"
                 to="/team"
                 icon={<PeopleOutlinedIcon/>}
                 selected={selected}
                 setSelected={setSelected}
                 />
                 <Item
-                title="contacts Informations"
+                title="Gestion des permissions"
                 to="/contacts"
                 icon={<ContactsOutlinedIcon/>}
                 selected={selected}
                 setSelected={setSelected}
                 /> 
                  <Item
-                title="Invoices Balances"
+                title="Gestion Des Roles"
                 to="/invoices"
                 icon={<ReceiptOutlinedIcon/>}
                 selected={selected}
@@ -163,7 +163,7 @@ const[selected,setSelected]=useState("Dashboard")
                  Pages
                 </Typography>
                 <Item
-                title="Profile Form"
+                title="Modifier profile"
                 to="/form"
                 icon={<PersonOutlinedIcon/>}
                 selected={selected}

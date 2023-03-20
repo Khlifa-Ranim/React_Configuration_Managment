@@ -1,4 +1,4 @@
-import { Box } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
 import { mockDataContacts } from "../../data/mockData";
@@ -53,6 +53,25 @@ const Contacts = () => {
       headerName: "Zip Code",
       flex: 1,
     },
+    {
+      field: "accessLevel",
+      headerName: "Access Level",
+      flex: 1,
+      renderCell: ({ row: { access } }) => {
+        return (
+          <>
+          <Button className="button_crud" >klklmm </Button>
+          <Button
+          border="1px solid red" 
+          backgroundColor="grren"
+          >klklmm </Button>
+          <Button>klklmm </Button>
+          </>
+
+        );
+      },
+    },
+  
   ];
 
   return (
@@ -101,6 +120,8 @@ const Contacts = () => {
           rows={mockDataContacts}
           columns={columns}
           components={{ Toolbar: GridToolbar }}
+        //  checkboxSelection 
+          
         />
       </Box>
     </Box>

@@ -1,34 +1,31 @@
-import * as AuthApi from'../api/AuthRequest'
-{/* Interaact with API*/}
+export const LOGIN_REQUEST = 'LOGIN_REQUEST';
+export const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
+export const LOGIN_FAILURE = 'LOGIN_FAILURE';
+export const LOGOUT = 'LOGOUT';
 
-{/*formData is paramétre that i have recive from component AUTH */}
-export const logIn=(formData)=>async(dispatch)=>{
-
-    {/*Interact with  the Database so i have the try/catch block */}
-
-  dispatch({type:"AUTH_START"})
-   {/*dispatch permet to  interact with reducer */}    
-    try {
-        
-        const{data}=await AuthApi.logIn(formData)
-        dispatch({type:"AUTH_SUCCESS" , data:data})
-
-    } catch (error) {
-        console.log(error)
-        dispatch({type:"AUTH_FAIL"})
+export const loginRequest = () => {
+    return {
+      type: LOGIN_REQUEST
     }
-}
-
-export const signUp=(formData)=>async(dispatch)=>{
-
-    dispatch({type:"AUTH_START"})     
-      try {
-          
-          const{data}=await AuthApi.signUp(formData)
-          dispatch({type:"AUTH_SUCCESS" , data:data})
-  
-      } catch (error) {
-          console.log(error)
-          dispatch({type:"AUTH_FAIL"})
-      }
   }
+  
+  export const loginSuccess = (user) => {
+    return {
+      type: LOGIN_SUCCESS,
+      payload: user
+    }
+  }
+  
+  export const loginFailure = (error) => {
+    return {
+      type: LOGIN_FAILURE,
+      payload: error
+    }
+  }
+  
+  export const logout = () => {
+    return {
+      type: LOGOUT
+    }
+  }
+  export default {loginRequest,loginSuccess,loginFailure,logout}
