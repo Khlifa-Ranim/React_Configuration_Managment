@@ -1,0 +1,163 @@
+import { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { fetchRoles } from "../../../redux/RolesSlices/FetchRolesSlice";
+import { CreateUsers_Roles } from "../../../redux/Users_RolesSlice/AddManyRolesToUserSlice";
+import { fetchUsers } from "../../../redux/UserSlices/FetchUserSlice";
+
+import Topbar from "../../global/Topbar";
+import Sidebar from "../../global/Sidebar";
+import "../User/NewUser.css";
+import Select from "react-select";
+import { Multiselect } from "multiselect-react-dropdown";
+
+const UsersRoles = () => {
+  const dispatch = useDispatch();
+  const role = useSelector((state) => state.FetchRolsStore);
+  console.log("role:", role.Roles);
+  const roles = role.Roles;
+
+  const [roleDeleted, setRoleDeleted] = useState(false); // state variable to keep track of deleted role
+  const filteredRoless = roles.filter((role) => role.id);
+  console.log("filteredRolessss", filteredRoless);
+
+ 
+
+  /*****************************Users Select*************************/
+
+  const user = useSelector((state) => state.FetchUsersStore);
+  const Users=user.users;
+  console.log("Users", Users);
+ const FiltterAllUsers=Users.filter((user)=>user.id)
+ console.log("FiltterAllUsers", FiltterAllUsers);
+
+  console.log(Users)
+
+  const [user_id, setUser_id] = useState([]);
+  const [role_ids, setRole_ids] = useState([]);
+
+
+  const CreateRolePermissionHandle = (e) => {
+    e.preventDefault();  
+    dispatch(CreateUsers_Roles({ role_ids, user_id }))
+    console.log(role_ids, user_id )
+  };
+
+  const FilterUser = Users.filter(
+    (user) => user.id
+  );
+  console.log("FilterUser", FilterUser);
+
+  useEffect(() => {
+    dispatch(fetchRoles());
+    if (roleDeleted) {
+      window.location.reload(); // trigger page refresh after role is deleted
+    }
+  }, [roleDeleted]); // run useEffect when roleDeleted changes
+
+  useEffect(() => {
+    dispatch(fetchUsers());
+  }, []);
+
+  /*****************************PERMISSION SELECT*************************/
+  // const [permission_id, setPermission_id] = useState([]); // state variable to keep track of selected permissions
+
+  const [selectAll, setSelectAll] = useState(false); // state variable to keep track of select all option
+
+  // function to handle select all option
+  const handleSelectAll = () => {
+    if (selectAll) {
+      // unselect all options
+      setUser_id([]);
+    } else {
+      // select all options
+      setUser_id(
+        FilterUser.map((user) => user.id)
+        
+      );
+    }
+    // toggle select all option
+    setSelectAll(!selectAll);
+  };
+
+  /*****************************Roles SELECT*************************/
+  // const [role_id, setRole_id] = useState([]); // state variable to keep track of selected permissions
+
+  const [selectAlll, setSelectAlll] = useState(false); // state variable to keep track of select all option
+
+  // function to handle select all option
+  const handleSelectRoleAll = () => {
+    if (selectAlll) {
+      // unselect all options
+      setRole_ids([]);
+    } else {
+      // select all options
+      setRole_ids(filteredRoless.map((role) => role.id));
+    }
+    // toggle select all option
+    setSelectAlll(!selectAlll);
+  };
+
+  return (
+    <>
+      <div className="app">
+        <Sidebar />
+        <div className="content">
+          <Topbar />
+          <div>
+            <form className="MainContainer2" onSubmit={CreateRolePermissionHandle}>
+              <h2 className="WelcomeText"> Create a new Relation Many Roles To one User</h2>
+
+              <label htmlFor="permission" className="NameInput">Select a Roles:</label>
+              
+              <div className="styleMultiselect">
+                <Multiselect
+                  className="Multiselect"
+                  options={filteredRoless}
+                  selectedValues={role_ids}
+                  onSelect={(selectedList) => setRole_ids(selectedList)}
+                  onRemove={(selectedList) => setRole_ids(selectedList)}
+                  displayValue="id"
+                />
+              </div>
+
+              <div className="styleMultiselect2">
+                <input
+                  type="checkbox"
+                  checked={selectAlll}
+                  onChange={handleSelectRoleAll}
+                />
+                <label htmlFor="selectAll" className="Input2">Select All Roles</label>
+              </div>
+
+
+              <label htmlFor="permission" className="NameInput">Select a User:</label>
+
+              <div className="styleMultiselect">
+                <Multiselect
+                  className="Multiselect"
+                  options={FilterUser}
+                  selectedValues={user_id}
+                  onSelect={(selectedList) =>
+                    setUser_id(selectedList)
+                  }
+                  onRemove={(selectedList) =>
+                    setUser_id(selectedList)
+                  }
+                  displayValue="id"
+                />
+              </div>
+
+
+              <div className="ButtonContainer">
+                <button className="Button" type="submit">
+                  Create Permission To A Role
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
+export default UsersRoles;

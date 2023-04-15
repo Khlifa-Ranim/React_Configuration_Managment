@@ -107,10 +107,10 @@ const[selected,setSelected]=useState("Dashboard")
                       color={colors.grey[100]}
                       fontWeight="bold"
                       sx={{m:"10px 0 0 0"}}>
-                        Ranim khlifa
-                      </Typography>
+                       Name   
+                         </Typography>
                     <Typography variant="h5" color={colors.greenAccent[500]}>
-                        Super Admin
+                        Role User
                     </Typography>
                 </Box>
 
@@ -134,14 +134,64 @@ const[selected,setSelected]=useState("Dashboard")
                 >
                  Data
                 </Typography>
-                <Item
+                {/* <Item
                 title=" Gestion des Utilisateurs"
                 to="/team"
                 icon={<PeopleOutlinedIcon/>}
                 selected={selected}
                 setSelected={setSelected}
+                /> */}
+                 <Item
+                title="Gestion des Utilisateurs"
+                to="/FetchUser"
+                icon={<PersonOutlinedIcon/>}
+                selected={selected}
+                setSelected={setSelected}
+                />
+                  
+                <Item
+                title="Gestion des Profiles"
+                to="/FetchProfiles"
+                icon={<ReceiptOutlinedIcon/>}
+                selected={selected}
+                setSelected={setSelected}
                 />
                 <Item
+                title="Gestion Des Roles"
+                to="/FetchRoles"
+                icon={<PersonOutlinedIcon/>}
+                selected={selected}
+                setSelected={setSelected}
+                />
+                <Item
+                title="Gestion Des Permissons"
+                to="/FetchPermissions"
+                icon={<ContactsOutlinedIcon/>}
+                selected={selected}
+                setSelected={setSelected}
+                />
+                  <Item
+                title="Gestion Des Roles-permission"
+                to="/FeatchRole_Permission"
+                icon={<ContactsOutlinedIcon/>}
+                selected={selected}
+                setSelected={setSelected}
+                />
+                   <Item
+                title="Gestion Des Users Roles"
+                to="/FeatchRolesUsers"
+                icon={<ContactsOutlinedIcon/>}
+                selected={selected}
+                setSelected={setSelected}
+                />
+                <Item
+                title="Gestion Des Types Des Utilisateurs"
+                to="/FeatchTypesUsers"
+                icon={<ContactsOutlinedIcon/>}
+                selected={selected}
+                setSelected={setSelected}
+                />
+                {/* <Item
                 title="Gestion des permissions"
                 to="/contacts"
                 icon={<ContactsOutlinedIcon/>}
@@ -154,7 +204,7 @@ const[selected,setSelected]=useState("Dashboard")
                 icon={<ReceiptOutlinedIcon/>}
                 selected={selected}
                 setSelected={setSelected}
-                />
+                /> */}
                 <Typography
                 variant="h6"
                 color={colors.grey[300]}
@@ -169,6 +219,14 @@ const[selected,setSelected]=useState("Dashboard")
                 selected={selected}
                 setSelected={setSelected}
                 />
+                <Item
+                title="Creer  un utilisatur"
+                to="/newUser"
+                icon={<PersonOutlinedIcon/>}
+                selected={selected}
+                setSelected={setSelected}
+                />
+ 
                 <Item
                 title="Calender"
                 to="/calender"

@@ -9,7 +9,6 @@ import '../../index.css';
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import *as UserApi from '../../api/UserRequests.js'
 const Form = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
   const dispatch = useDispatch()
@@ -58,7 +57,7 @@ const [profileUser, setProfileUser] = useState({});
      <div  className="content">
      <Topbar/>
 <Box m="20px">
-   <Header title="Modifier Mon Profile" subtitle="Mes Information"></Header>
+   <Header title="Create Mon Profile" subtitle="Mes Information"></Header>
  
  <Formik
    onSubmit={handleFormSubmit}

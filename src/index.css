@@ -15,6 +15,7 @@ body,
    background-color: "grren";
 }
 
+
 .app {
   display: flex;
   position: relative;
@@ -39,3 +40,41 @@ body,
   background: #555;
 }
 
+/* Define a CSS class for the button */
+.button-style {
+  height: 44px;
+  width: 42%;
+  background-color: #65e892;
+  margin-top: 20px;
+  font-size: 22px;
+  font-family: Arial;
+  font-weight: bold;
+  box-shadow: 0 2px 4px rgba(156, 154, 154, 0.2);
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.2s ease-in-out;
+  outline: none; /* Remove the underline */
+}
+
+/* Define the focus styles for the button */
+.button-style:focus {
+  outline: 2px solid rgb(121, 118, 118);
+  outline-offset: 2px;
+}
+
+.search_input{
+  height: "44px";
+  width:"42%";
+  backgroundColor:"#d9dad7";
+  paddingLeft:"44px";
+  backgroundImage:
+    'url("https://cdn-icons-png.flaticon.com/512/149/149852.png")';
+  backgroundSize: "20px";
+  backgroundRepeat: "no-repeat";
+  backgroundPosition: "12px 50%";
+  border: "none";
+  borderRadius: "4px";
+  boxShadow: "0 2px 4px rgba(0,0,0,0.2)";
+  marginBottom:"8px";
+}
