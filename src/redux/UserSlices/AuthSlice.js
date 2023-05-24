@@ -1,4 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { message } from "antd";
+
 
 const initialState = {
   user: "",
@@ -11,19 +13,29 @@ const initialState = {
 };
 //*******************FUNCTION--LoginIn********************/
 
-export const SignInUser = createAsyncThunk("SignInUser", async (body) => {
+export const SignInUser = createAsyncThunk(
+  "auth/SignInUser", async (body,rejectWithValue) => {
+  
   const res = await fetch("http://localhost:5000/user/login", {
     method: "post",
     headers: {
       "Content-Type": "application/json",
       // 'Authorization': `Bearer ${token}`
       //"Authorization": `Bearer ${("token")}`,
-      // "Authorization": `Bearer ${localStorage.getItem("token")}`,
+      "Authorization": `Bearer ${localStorage.getItem("token")}`,
     },
     body: JSON.stringify(body),
   });
-  return await res.json();
+  const data= await res.json();
+   if (!res.ok) {
+    /**************msg error */
+    message.error(data.message);
+    const { error } = await res.json();
+    return rejectWithValue(error);
+  }
+  return data;
 });
+
 
 const AuthSlice = createSlice({
   name: "AuthStore",
@@ -33,43 +45,13 @@ const AuthSlice = createSlice({
       state.token = localStorage.getItem("token");
     },
 
-    // addUser: (state, action) => {
-    //   // state.user = JSON.parse(localStorage.getItem("user"));
-    //   const storedUser = localStorage.getItem("user");
-    //   if (storedUser) {
-    //     state.user = JSON.parse(storedUser);
-    //   }
-    // },
-
     addUser: (state, action) => {
       state.user = localStorage.getItem("user");
 
-      // const user = action.payload;
-      // if (user) {
-      //   state.user = JSON.parse(user);
-      //   localStorage.setItem("user", user);
-      // }
+
     },
 
-    // addUser: (state, action) => {
-
-    //   state.user = JSON.parse(localStorage.getItem("user"));
-
-    //    console.log('addUser reducer called'); // Add this line to check if the function is being called
-
-    //   // const storedUser = localStorage.getItem("user");
-    //   // const user = state.user || JSON.parse(storedUser);
-    //   // console.log("storedUser", storedUser);
-    //   // console.log("user", user);
-
-    //   // if (user !== null) {
-    //   //   try {
-    //   //     state.user = user;
-    //   //   } catch (e) {
-    //   //     console.error("Error parsing stored user data:", e);
-    //   //   }
-    //   // }
-    // },
+ 
 
     logout: (state, action) => {
       state.token = null;

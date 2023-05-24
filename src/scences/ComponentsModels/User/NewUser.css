@@ -54,6 +54,41 @@ justify-content: center;
   width: 100%;
   
 }
+
+.InputContainer p {
+  font-size: 16px;
+  /* font-weight: bold; */
+  margin-bottom: 10px;
+}
+.InputContainer p:last-child {
+  margin-bottom: 0;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 20px 0;
+}
+
+thead {
+  background-color: #f8d3f5;
+}
+
+th {
+  text-align: left;
+  padding: 8px;
+}
+
+
+td {
+  padding: 10px;
+  border: 1px solid #ae99df;
+}
+
+tr:nth-child(even) {
+  background-color: #e9e3e9;
+}
+
 .InputContainer3{
   display: flex;
   flex-direction: column;
@@ -131,9 +166,22 @@ justify-content: center;
 margin-top:60px;
 }
 .WelcomeText{
-  margin: 3rem 0 2rem 0;
+  margin: 3rem 0 8rem 0;
   color: rgb(195, 128, 250);
 
+}
+.back-btn {
+  background-color: #8f8787;
+  color: white;
+  padding: 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-left: 500px;
+margin-top: 20px;}
+
+.back-btn:hover {
+  background-color: #4a4b4a;
 }
 .LoginWidth{
   cursor:pointer;
@@ -255,8 +303,161 @@ margin-left:14%;
   border-radius: 2rem;
   cursor: pointer;
 }
+.ButtonConfiguration{
+
+  background: linear-gradient(to right, #14163c 0%, #03217b 79%);
+  text-transform: uppercase;
+  letter-spacing: 0.2rem;
+  width: 65%;
+  height: 3rem;
+  border: none;
+  color: white;
+  border-radius: 2rem;
+  cursor: pointer;
+  margin-top:28px;
+}
 
 .Button:disabled{
   background: silver;
   pointer-events: none;
+}
+
+/* /********************Form Versionner Configuration*********************** */
+.container {
+  background: linear-gradient(135deg, #8A8FF7 0%, #373b44 100%);
+  /* Add any additional styling you want for the 3D background */
+}
+
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 1000px;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 20px;
+  position: relative;
+  margin-left:180px;
+  margin-top: 120px;
+}
+
+.title {
+  font-size: 28px;
+  color: #8A8FF7;
+  font-weight: 600;
+  letter-spacing: -1px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding-left: 30px;
+}
+
+.title::before,.title::after {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  border-radius: 50%;
+  left: 0px;
+  background-color:#8A8FF7;
+}
+
+.title::before {
+  width: 18px;
+  height: 18px;
+  background-color: #8A8FF7;
+}
+
+.title::after {
+  width: 18px;
+  height: 18px;
+  animation: pulse 1s linear infinite;
+}
+
+.message, .signin {
+  color: rgba(88, 87, 87, 0.822);
+  font-size: 14px;
+}
+
+.signin {
+  text-align: center;
+}
+
+.signin a {
+  color: royalblue;
+}
+
+.signin a:hover {
+  text-decoration: underline royalblue;
+}
+
+.flex {
+  display: flex;
+  width: 100%;
+  gap: 6px;
+}
+
+.form label {
+  position: relative;
+}
+
+.form label .input {
+  width: 100%;
+  padding: 10px 10px 20px 10px;
+  outline: 0;
+  border: 1px solid rgba(105, 105, 105, 0.397);
+  border-radius: 10px;
+}
+
+.form label .input + span {
+  position: absolute;
+  left: 10px;
+  top: 15px;
+  color: grey;
+  font-size: 0.9em;
+  cursor: text;
+  transition: 0.3s ease;
+}
+
+.form label .input:placeholder-shown + span {
+  top: 15px;
+  font-size: 0.9em;
+}
+
+.form label .input:focus + span,.form label .input:valid + span {
+  top: 30px;
+  font-size: 0.7em;
+  font-weight: 600;
+}
+
+.form label .input:valid + span {
+  color:black;
+}
+
+.submit {
+  border: none;
+  outline: none;
+  background-color: #8A8FF7;
+  padding: 10px;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 16px;
+  transform: .3s ease;
+}
+
+.submit:hover {
+  background-color: #8A8FF7;
+}
+
+@keyframes pulse {
+  from {
+    transform: scale(0.9);
+    opacity: 1;
+  }
+
+  to {
+    transform: scale(1.8);
+    opacity: 0;
+  }
 }

@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import jwt_decode from "jwt-decode";
 
 
 export const editPermission = createAsyncThunk(
@@ -19,6 +20,21 @@ export const editPermission = createAsyncThunk(
       if (!response.ok) {
         return rejectWithValue(data.error);
       }
+    
+
+    // ADD LOG
+    const log = await fetch("http://localhost:5000/logs", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      body: JSON.stringify({
+        action: `${
+          jwt_decode(localStorage.getItem("token")).username
+        } update Permission with : ${updatedPermission.endpoint} and Methode : ${updatedPermission.method}  `,
+      }),
+    });
 
       return data;
     } catch (error) {

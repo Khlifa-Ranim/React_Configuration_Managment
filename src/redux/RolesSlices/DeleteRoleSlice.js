@@ -1,4 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import jwt_decode from "jwt-decode";
 
 export const deleteRoles = createAsyncThunk(
   "role/deleteRoles",
@@ -12,6 +13,20 @@ export const deleteRoles = createAsyncThunk(
         },
       });
       if (response.status === 200) {
+        const log = await fetch("http://localhost:5000/logs", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify({
+            action: `${
+              jwt_decode(localStorage.getItem("token")).username
+            } deleted Role with id: ${id}`,
+          }),
+        });
+        // Refresh the page
+        window.location.reload();
         return "role deleted successfully";
       } else if (response.status === 202) {
         return "Nothing deleted";
@@ -20,7 +35,9 @@ export const deleteRoles = createAsyncThunk(
       } else if (response.status === 403) {
         throw new Error("Forbidden - User does not have necessary roles");
       } else if (response.status === 404) {
-        throw new Error("Not Found - Endpoint not found or invalid permissions");
+        throw new Error(
+          "Not Found - Endpoint not found or invalid permissions"
+        );
       } else {
         throw new Error("Internal Server Error");
       }
@@ -34,7 +51,7 @@ const DdeleteRolesSlice = createSlice({
   name: "deleteRoles",
   initialState: {
     isLoding: false,
-    error: null
+    error: null,
   },
 
   extraReducers: {
@@ -49,14 +66,14 @@ const DdeleteRolesSlice = createSlice({
     [deleteRoles.rejected]: (state, action) => {
       state.isLoding = false;
       if (action.payload === "INVALID_ROLE") {
-        state.error = "Cannot delete role - role does not exist or unauthorized.";
+        state.error =
+          "Cannot delete role - role does not exist or unauthorized.";
       } else {
         state.error = action.payload;
       }
-    }
-  }
-
+    },
+  },
 });
 
 export default DdeleteRolesSlice.reducer;
-export const {  removeUser } = DdeleteRolesSlice.actions;
+export const { removeUser } = DdeleteRolesSlice.actions;

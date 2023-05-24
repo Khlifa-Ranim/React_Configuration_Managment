@@ -29,15 +29,33 @@ import FeatchRoleById from "./scences/ComponentsModels/Roles/FeatchRoleById";
 import FetchPermissionById from "./scences/ComponentsModels/Permissions/FeatchPermissionById";
 import FetchUseryId from "./scences/ComponentsModels/User/FeatchUserById";
 import EditUser from "./scences/ComponentsModels/User/EditUser";
-import Roles_Permissions from "./scences/ComponentsModels/Roles-Permissions/AddRoles_Permission";
+import Roles_Permissions from "./scences/ComponentsModels/Roles-Permissions/AddManyPermissionsToOneRole";
 import FeatchRole_Permission from "./scences/ComponentsModels/Roles-Permissions/FeatchRoles_Permission";
 import FetchRolesPermissionById from "./scences/ComponentsModels/Roles-Permissions/FeatchPermissionRolesById";
+import AddPerRoles from "./scences/ComponentsModels/Roles-Permissions/AddPermissionToRole";
 import FeatchRolesUsers from "./scences/ComponentsModels/Users_Roles/All_Users_Roles";
 import FeatchTypesUsers from "./scences/ComponentsModels/Types_Users/All_Types_users";
 import AddUsersTypes from "./scences/ComponentsModels/Types_Users/AddTypesUsers";
 import EditTypesUsers from "./scences/ComponentsModels/Types_Users/EditUsersTypes";
 import AddUsersRoles from "./scences/ComponentsModels/Users_Roles/AddUsersRoles";
 import AddManyUsersRoles from "./scences/ComponentsModels/Users_Roles/AddManyRolesToUser";
+import AddRoleUsers from "./scences/ComponentsModels/Users_Roles/AddOneRoleToUser";
+import AddUsers from "./scences/ComponentsModels/User/AddUsers";
+import FeatchRolesUserById from "./scences/ComponentsModels/Users_Roles/FeatchRolesUserById";
+import FeatchConfigurations from "./scences/ComponentsModels/Configurations/Featch_Configurations";
+import FeatchConfigurationById from "./scences/ComponentsModels/Configurations/Featch_ConfigurationById";
+import EditConfiguration from "./scences/ComponentsModels/Configurations/Edit_Configuration";
+import FeachProfileId from "./scences/ComponentsModels/profiles/GetProfiles_ById";
+import FetchTypeById from "./scences/ComponentsModels/Types_Users/FeatchTypeById";
+import AddConfiguration from "./scences/ComponentsModels/Configurations/Add_Configuration";
+import EditProfile from "./scences/ComponentsModels/profiles/Edit_Profile";
+import FeatchLogs from "./scences/ComponentsModels/Logs/Logs"
+import FeatchConfigurationVersion from "./scences/ComponentsModels/Configuration_Versions/FeatchConfigurationVersion"
+import VersionnerConfiguration from "./scences/ComponentsModels/Configuration_Versions/VersionnerConfiguration";
+import FeatchConfigurationVersionByID from "./scences/ComponentsModels/Configuration_Versions/FeatchConfigurationVersionById";
+
+
+
 
 
 
@@ -64,7 +82,7 @@ function App() {
               /> */}
               <Route
                 path="/dashboard"
-                element={isAuthenticated ? <Dashboard /> : null}
+                element={isAuthenticated ? <Dashboard /> : <Login />}
               />
 
               <Route
@@ -96,6 +114,20 @@ function App() {
                 path="/FeatchTypesUsers"
                 element={isAuthenticated ? <FeatchTypesUsers /> : <Login />}
               />
+                <Route
+                path="/FeatchConfigurations"
+                element={isAuthenticated ? <FeatchConfigurations /> : <Login />}
+              />
+                 <Route
+                path="/FeatchLogs"
+                element={isAuthenticated ? <FeatchLogs /> : <Login />}
+              />
+              
+              <Route
+                path="/FeatchConfigurationVersion"
+                element={isAuthenticated ? <FeatchConfigurationVersion /> : <Login />}
+              />
+
               <Route
                 path="/newUser"
                 element={isAuthenticated ? <CreateUser /> : <Login />}
@@ -109,6 +141,10 @@ function App() {
                 path="/AddRole"
                 element={isAuthenticated ? <AddRole /> : <Login />}
               />
+              <Route
+                path="/AddUsers"
+                element={isAuthenticated ? <AddUsers /> : <Login />}
+              />
                 <Route
                 path="/AddUsersTypes"
                 element={isAuthenticated ? <AddUsersTypes /> : <Login />}
@@ -118,9 +154,22 @@ function App() {
                 path="/AddUsersRoles"
                 element={isAuthenticated ? <AddUsersRoles /> : <Login />}
               />
+              
+             <Route
+                path="/AddPerRoles"
+                element={isAuthenticated ? <AddPerRoles /> : <Login />}
+              />
+               <Route
+                path="/AddRoleUsers"
+                element={isAuthenticated ? <AddRoleUsers /> : <Login />}
+              />
                  <Route
                 path="/AddManyUsersRoles"
                 element={isAuthenticated ? <AddManyUsersRoles /> : <Login />}
+              />
+                 <Route
+                path="/AddConfiguration"
+                element={isAuthenticated ? <AddConfiguration /> : <Login />}
               />
               <Route
                 path="/NewProfile"
@@ -141,6 +190,18 @@ function App() {
             element={isAuthenticated ? <EditTypesUsers /> : <Login />}
             />
               <Route
+            path="/EditConfiguration/:id"
+            element={isAuthenticated ? <EditConfiguration /> : <Login />}
+            />
+              <Route
+            path="/EditProfile/:id"
+            element={isAuthenticated ? <EditProfile /> : <Login />}
+            />
+            <Route
+            path="/VersionnerConfiguration/:id"
+            element={isAuthenticated ? <VersionnerConfiguration /> : <Login />}
+            />
+              <Route
                 path="/FeachRoleId/:id"
                 element={isAuthenticated ? <FeatchRoleById /> : <Login />}
               />
@@ -156,6 +217,28 @@ function App() {
               <Route
                 path="/FetchRolesPermissionById/:id"
                 element={isAuthenticated ? <FetchRolesPermissionById /> : <Login />}
+              />
+               <Route
+                path="/FeatchRolesUserById/:id"
+                element={isAuthenticated ? <FeatchRolesUserById /> : <Login />}
+              />
+                <Route
+                path="/FeatchConfigurationById/:id"
+                element={isAuthenticated ? <FeatchConfigurationById /> : <Login />}
+              />
+
+             <Route
+                path="/FeachProfileId/:id"
+                element={isAuthenticated ? <FeachProfileId /> : <Login />}
+              />
+
+              <Route
+                path="/FetchTypeById/:id"
+                element={isAuthenticated ? <FetchTypeById /> : <Login />}
+              />
+                <Route
+                path="/FeatchConfigurationVersionByID/:id"
+                element={isAuthenticated ? <FeatchConfigurationVersionByID /> : <Login />}
               />
               <Route
                 path="/EditUser/:id"

@@ -1,166 +1,225 @@
 import React, { useEffect, useState } from "react";
 import Topbar from "../../global/Topbar";
 import Sidebar from "../../global/Sidebar";
-import { useDispatch, useSelector } from 'react-redux';
-import {editUser}  from'../../../redux/UserSlices/EditUserSlice'
+import { useDispatch, useSelector } from "react-redux";
+import { editUser } from "../../../redux/UserSlices/EditUserSlice";
 import "../User/NewUser.css";
 import { useNavigate, useParams } from "react-router-dom";
 
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
+import { fetchRoles } from "../../../redux/RolesSlices/FetchRolesSlice";
 
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 
-const EditPermission = () => {    
-  
-  const {id}=useParams(); //take the id from  the router
+const EditPermission = () => {
+  const { id } = useParams(); //take the id from  the router
   const user = useSelector((state) => state.FetchUsersStore);
 
-
-  const navigate=useNavigate();
+  const Navigate = useNavigate();
 
   const dispatch = useDispatch();
 
-  const Users=user.users;
-  console.log(Users)
+  const role_permission = useSelector((state) => state.FetchRolsStore);
+  console.log("role:", role_permission.Roles);
+  const roles_permissions = role_permission.Roles;
+  console.log("roles_permissions", roles_permissions);
 
+  const filteredRolesPermissions = roles_permissions.filter(
+    (role) => role.name
+  );
 
-  const existingPermission=Users.filter(f=>f.id==id);
+  useEffect(() => {
+    dispatch(fetchRoles());
+  }, []);
 
-  const {username,type_id,role_id}=existingPermission[0];
+  const Users = user.users;
+  console.log(Users);
+
+  const existingPermission = Users.filter((f) => f.id == id);
+
+  const { username, USER_TYPE, password,roles } = existingPermission[0];
 
   const [uUsername, setUUsername] = useState(username);
-  const [uType_id, setUType_id] = useState(type_id);
-  const [uRole_id, setURole_id] = useState(role_id);
+  // const [uType_id, setUType_id] = useState(USER_TYPE);
+  const [uPassword, setUPassword] = useState(password);
+  const [uRole, setURole] = useState(roles);
 
-  // const [formErrors,setFromErrors]= useState({});
-  // const [isSubmit,setIsSubmit]= useState(false);
+  console.log(password);
+  console.log(USER_TYPE);
+  console.log(username);
 
-  const notify=()=>{
-    toast(" Update succeed  👌")
-   }
+  const [formErrors, setFromErrors] = useState({});
+  const [isSubmit, setIsSubmit] = useState(false);
 
-const EditUserHandle=(e)=>{
-  e.preventDefault();
-  console.table(uUsername,uType_id,uRole_id)
+  const notify = () => {
+    toast(" Update succeed  👌");
+  };
 
-  // setFromErrors(validate(uEndpoint,uMethod,uDescription));
-  // setIsSubmit(true);
+  const EditUserHandle = (e) => {
+    e.preventDefault();
+    setFromErrors(validate(uPassword));
+    setIsSubmit(true);
 
-  // if (Object.keys(formErrors).length === 0 && uEndpoint.trim() !== '' && uMethod.trim() !== ''&& uDescription.trim() !== '') {
+    console.table(uUsername, uPassword,uRole);
 
-  dispatch(editUser({id:id,uUsername:uUsername,uType_id:uType_id,uRole_id:uRole_id}))
-  notify(); // display toast notification
-  setTimeout(() => navigate("/FetchUser"), 200); // redirect after 3 seconds
+    if (Object.keys(formErrors).length === 0 && uPassword.trim() !== "") {
+      dispatch(editUser({id:id,username:uUsername,password:uPassword,role:uRole}))
+      setTimeout(() => Navigate("/FetchUser"), 200); // redirect after 3 seconds
+    }
 
-}
+  };
 
+  const [showPassword, setShowPassword] = useState(false);
 
-// const validate = (uEndpoint,uMethod,uDescription) => {
-//   const errors = {};
+  const togglePasswordVisibility = (e) => {
+    e.preventDefault(); //this ligne permet de n'est pas reload the page when i click on the button
+    setShowPassword(!showPassword);
+  };
 
-//   const endpoint_pattern = /^[a-zA-Z\s]*$/;
-//   const method_pattern = /^(GET|PUT|DELETE|POST)$/;
-//   const description_pattern = /^[a-zA-Z\s]*$/;
+  const validate = (uPassword) => {
+    const errors = {};
 
-//   if (!uEndpoint) {
-//     errors.uEndpoint = "Endpoint is Required";
-//   } else if (!uEndpoint.startsWith("/")) {
-//     errors.uEndpoint = "Endpoint should start with /";
-//   } else if (uEndpoint.length <2) {
-//     errors.uEndpoint = "Endpoint should contain at least 8 letters";
-//   }
+    const passwordPattern =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,50}$/; // pattern to check if password has at least one uppercase, one lowercase, one digit, one special character, and is between 8 to 50 characters long
 
-//   if (!uMethod) {
-//     errors.uMethod = "Method is Required";
-//   } else if (!method_pattern.test(uMethod)) {
-//     errors.uMethod = "Method should be GET, PUT, DELETE, or POST";
-//   }
+    if (!uPassword) {
+      errors.uPassword = "Password is Required";
+    }
+    //  else if (password.length < 4) {
+    //   errors.password = "Password should contain at least 4 characters";
+    // }
+    else if (!passwordPattern.test(uPassword)) {
+      errors.uPassword =
+        "Les mots de passe doivent comporter entre 8 et 50 caractères et doivent inclure au moins une lettre majuscule, une lettre minuscule, un chiffre et un caractère spécial tel que !@#$%^&*.";
+    }
 
-//   if (!uDescription) {
-//     errors.uDescription = "Description is Required";
-//   } else if (!description_pattern.test(uDescription)) {
-//     errors.uDescription = "Description should only contain letters and spaces";
-//   } else if (uDescription.length < 8) {
-//     errors.uDescription = "Description should contain at least 8 letters";
-//   }
+    return errors;
+  };
 
-//   return errors;
-// };
+  useEffect(() => {
+    if (Object.keys(formErrors).length > 0 && isSubmit) {
+      console.log(formErrors);
+    }
+  }, [formErrors, isSubmit]);
 
+  return (
+    <>
+      <div className="app">
+        <Sidebar />
+        <div className="content">
+          <Topbar />
 
-// useEffect(() => {
-//   if (Object.keys(formErrors).length > 0 && isSubmit) {
-//     console.log(formErrors);
-//   }
-// }, [formErrors, isSubmit]);
+          <div
+            className="container"
+            style={{
+              height: "200px",
+              paddingTop: "80px",
+              paddingBottom: "180px",
+            }}
+          >
+            <form class="form">
+              <p class="title">Edit User</p>
+              <p class="message">Update account user </p>
+              <label>
+                <input
+                  required=""
+                  placeholder=""
+                  type="text"
+                  class="input"
+                  value={uUsername}
+                  // onChange={(e) => setUUsername(e.target.value)}
+                />
+                <span>Username</span>
+                {/* <p style={{ color: "red" }}>{formErrors.username}</p> */}
+              </label>
 
-  return (<>
+              <label>
+                <div className="InputWithButton">
+                  <input
+                    class="input"
+                    value={uPassword}
+                    type={showPassword ? "text" : "password"}
+                    onChange={(e) => {
+                      const { name, value } = e.target;
+                      setUPassword(value);
+                      setFromErrors({ ...formErrors, [name]: value });
+                    }}
+                  />
+                  <span>Password</span>
+                  <RemoveRedEyeIcon
+                    style={{
+                      position: "absolute",
+                      top: "50%",
+                      right: "10px",
+                      transform: "translateY(-50%)",
+                    }}
+                    onClick={togglePasswordVisibility}
+                  />
+                  <p style={{ color: "red" }}>{formErrors.uPassword}</p>
+                </div>
+              </label>
+              <label>
+                <select
+                  id="role"
+                  name="role"
+                  class="input"
+                  value={uRole}
+                  onChange={(e) =>setURole(e.target.value) }
 
-     <div  className="app">
-    <Sidebar/> 
-     <div  className="content">
-     <Topbar/>
+                >
 
+                  {filteredRolesPermissions.map((role) => (
+                    <option key={role.name} value={role.name}>
+                      {role.name}
+                    </option>
+                  ))}
+                </select>
+                <span>Select a role for the user</span>
+                <p style={{ color: "red" }}>{formErrors.role}</p>
+              </label>
 
-      <form className="MainContainer2">
-      <h2 className="WelcomeText">Modifier  User</h2>
-      <div className="InputContainer">
-         <input
-         className="Input"
-          type="text" 
-          placeholder="EndPoint"
-          value={uUsername} 
-          onChange={(e) => setUUsername(e.target.value)}
-          required
+              {/* <label>
+                <input
+                  required=""
+                  placeholder=""
+                  type="text"
+                  class="input"
+                  value={uType_id}
+                  onChange={(e) => setUType_id(e.target.value)}
+                />
+                <span>User Type</span>
+                {/* {/* <p style={{ color: "red" }}>{formErrors.username}</p> */}
+              {/* </label> */} 
 
-       />
-        {/* <p style={{color:"red"}}>{formErrors.uEndpoint}</p> */}
-
-
-        <input
-         className="Input"
-         type="text" 
-         value={uType_id}
-         placeholder="Methode"
-         onChange={(e) => setUType_id(e.target.value)}
-         required
-        />
-               {/* <p style={{color:"red"}}>{formErrors.uMethod}</p> */}
-
-          <input
-         className="Input"
-         placeholder="Description"
-         type="text"
-          value={uRole_id}
-          onChange={(e) => setURole_id(e.target.value)}
-          required
-        />
-         {/* <p style={{color:"red"}}>{formErrors.uDescription}</p> */}
-
-      </div>
-
-      <div className="ButtonContainer">
-
-      <button  
-      className="Button" 
-      type="submit" 
-      onClick={EditUserHandle}
-      >Modifier User</button>    
-    
-      </div>
-
-      </form>
-
+              <div style={{ marginLeft: "40px" }}>
+                <button
+                  class="submit"
+                  onClick={EditUserHandle}
+                  style={{ width: "400px" }}
+                >
+                  Update User
+                </button>
+                <button
+                  class="submit"
+                  onClick={() => {
+                    Navigate("/FetchUser");
+                  }}
+                  style={{
+                    marginLeft: "20px",
+                    background: "gray",
+                    width: "400px",
+                  }}
+                >
+                  Cancel{" "}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
-        </div>
-
-
-    
-  </>
+      </div>
+    </>
   );
-}
-
+};
 
 export default EditPermission;
-
-

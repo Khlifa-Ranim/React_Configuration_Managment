@@ -1,4 +1,3 @@
-
 import { Box, Button } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { tokens } from "../../../theme";
@@ -13,12 +12,15 @@ import { useNavigate } from "react-router-dom";
 
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchUsers_Roles,fetchRolesPermission } from "../../../redux/Users_RolesSlice/Featch_Users_RolesSlice";
-import { deleteRolePermissions } from "../../../redux/Permission_RoleSlice/DeletePermissionRolesSlice";
+import {
+  fetchUsers_Roles,
+  featchUsers_RolesById,
+} from "../../../redux/Users_RolesSlice/Featch_Users_RolesSlice";
+import { deleteUserRole } from "../../../redux/Users_RolesSlice/DeleteUser_RolesSlice";
 
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 
 const Users_Roles = () => {
   const theme = useTheme();
@@ -26,89 +28,97 @@ const Users_Roles = () => {
   const navigate = useNavigate();
 
   const dispatch = useDispatch();
-  const Users_Roles = useSelector((state) => state.Featch_Users_Roles_SliceStore);
-  console.log("role_permissionsss:", Users_Roles.UsersRoles);
+  const Users_Roles = useSelector(
+    (state) => state.Featch_Users_Roles_SliceStore
+  );
+  console.log("Users_Roles:", Users_Roles.UsersRoles);
   const Tab_Users_Roles = Users_Roles.UsersRoles;
-
+  // console.log("Users_Roles:", Tab_Users_Roles); // add this line to check the value of roles_permissions
 
   const notify = () => {
     toast(" Delete succeed  👌");
   };
+  const sortedTabUserRoles= [...Tab_Users_Roles].sort(
+    (a, b) => b.id - a.id
+  );
 
   useEffect(() => {
     dispatch(fetchUsers_Roles());
   }, []);
 
-//   console.log(role_permission.Permissions_Roles); // <-- add this line to check the value of user.users
-  
-  
-  const fetchPermissionn = (id, roles_permissions) => {
-    console.log("fetch one Role active");
-    console.log("roles_permissions:", roles_permissions); // add this line to check the value of roles_permissions
-    const selectedPermission = roles_permissions.find((item) => item.permission_names);
-    console.log("selectedPermission", selectedPermission);
-    // dispatch(fetchRolesPermission(id));
-    navigate(`/FetchRolesPermissionById/${id}`);
-  };
+  //   console.log(role_permission.Permissions_Roles); // <-- add this line to check the value of user.users
 
+  const FetchRolesUsersById = (id) => {
+    console.log("fetch one Role active");
+    // console.log("Users_Roles:", Tab_Users_Roles); // add this line to check the value of roles_permissions
+    const selectedPermission = Tab_Users_Roles.find((item) => item.id === id);
+    console.log("selectedPermission", selectedPermission);
+    dispatch(featchUsers_RolesById(id));
+    navigate(`/FeatchRolesUserById/${id}`);
+  };
 
   const getRowId = (row, index) => {
     return (index + 1).toString();
   };
 
-  const DeleteRolePermissions = (id) => {
+  const DeleteUsersRoles = (id, roles_ids) => {
     console.log("delete roleprmission active");
-    notify(); // display toast notification
-    dispatch(deleteRolePermissions(id));
+    // notify(); // display toast notification
+    dispatch(deleteUserRole(id, roles_ids));
+    console.log("id,roles_ids", id, roles_ids);
     // navigate("/FetchRoles");
-
   };
 
   const [searchTerm, setSearchTerm] = useState("");
   console.log(searchTerm);
 
+  const rows = Users_Roles.loading
+    ? []
+    : Users_Roles.error
+    ? []
+    : sortedTabUserRoles.map((Users_Roles, index) => ({
+        ...Users_Roles,
+        // id: roles_permissions.role_name,
+        // id: getRowId(Users_Roles, index),
+      }));
 
-  const rows = 
-              Users_Roles.loading
-              ? []
-              : Users_Roles.error
-              ? []
-              : Users_Roles.UsersRoles.map((Users_Roles, index) => ({
-                  ...Users_Roles,
-                  // id: roles_permissions.role_name,
-                  id: getRowId(Users_Roles, index),
-
-              }));
-
-const filteredRows = rows.filter((row) =>
-row.username.toLowerCase().includes(searchTerm.toLowerCase())
-);
-console.log(filteredRows);
-
+  const filteredRows = rows.filter((row) =>
+    row.username.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+  console.log(filteredRows);
 
   const columns = [
-    { field: "id", headerName: "id", flex: 0.5 },
+    { field: "id", headerName: "id", flex: 0.5, hide: true },
+
     {
-        field: "roles_names",
-        headerName: "roles_names",
-        flex: 1,
-        cellClassName: "name-column--cell",
-      },
-  
-    { field: "username", headerName: "username" },
-  
+      field: "username",
+      headerName: "username",
+      flex:1,
+      renderCell: (params) => (
+        <div style={{ fontSize: "14px", color: "black" }}>{params.value}</div>
+      ),
+    },
+    {
+      field: "roles_names",
+      headerName: "roles_names",
+      flex: 1,
+      cellClassName: "name-column--cell",
+      renderCell: (params) => (
+        <div style={{ fontSize: "14px" }}>{params.value}</div>
+      ),
+    },
+
     {
       field: "accessLevel",
       headerName: "Access Level",
       flex: 1,
       renderCell: ({ row }) => {
-        
         return (
           <>
-              <Button
+            <Button
               variant="contained"
               color="secondary"
-              onClick={() => fetchPermissionn(row.id)}
+              onClick={() => FetchRolesUsersById(row.id)}
               style={{ marginRight: "10px", backgroundColor: "#a8e6cf" }} // add margin-right inline style
             >
               Read
@@ -117,23 +127,11 @@ console.log(filteredRows);
             <Button
               variant="contained"
               color="secondary"
-              onClick={() => DeleteRolePermissions(row.id)}
+              onClick={() => DeleteUsersRoles(row.id, row.roles_ids)}
               style={{ marginRight: "10px", backgroundColor: "#FFC0CB" }} // add margin-right inline style
             >
               Delete
             </Button>
-            <Link to={`/EditRole/${row.id}`}>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={() => {
-                  // setId(row.id)
-                }}
-                style={{ marginRight: "10px" }} // add margin-right inline style
-              >
-                Edit
-              </Button>
-            </Link>
           </>
         );
       },
@@ -146,10 +144,7 @@ console.log(filteredRows);
       <div className="content">
         <Topbar />
         <Box m="20px">
-        <Header
-        title="Les Permissuions Users Roles"
-        subtitle="Listes Des  Permissuions Users Roles"
-      />
+          <Header title="Roles To user" subtitle="List Roles To user" />
 
           <Box
             m="40px 0 0 0"
@@ -206,7 +201,7 @@ console.log(filteredRows);
                 placeholder="Search With Username..."
               />
             </div>
-            <Link to="/AddUsersRoles">
+            <Link to="/AddRoleUsers">
               <Button
                 className="button"
                 variant="contained"
@@ -227,9 +222,9 @@ console.log(filteredRows);
                   transition: "all 0.2s ease-in-out",
                   display: "flex",
                   justifyContent: "center",
-                }}// add margin-right inline style
+                }} // add margin-right inline style
               >
-                Add New Users Roles
+                Add one Roles to a User
               </Button>
             </Link>
             <Link to="/AddManyUsersRoles">
@@ -253,22 +248,21 @@ console.log(filteredRows);
                   transition: "all 0.2s ease-in-out",
                   display: "flex",
                   justifyContent: "center",
-                }}// add margin-right inline style
+                }} // add margin-right inline style
               >
-                Add   Many Roles to one User
+                Add Many Roles to one User
               </Button>
             </Link>
 
-<DataGrid
-  rows={filteredRows}
-  columns={columns}
-  components={{ Toolbar: GridToolbar }}
-  // getRowId={(row) => row.role_name}
-  getRowId={(row) => row.id}
+            <DataGrid
+              rows={filteredRows}
+              columns={columns}
+              components={{ Toolbar: GridToolbar }}
+              // getRowId={(row) => row.role_name}
+              getRowId={(row) => row.id}
 
-//   onRowClick={(row) => fetchPermissionn(row.id, role_permission.Permissions_Roles)}
-/>
-
+              // onRowClick={(row) => fetchPermissionn(row.id, role_permission.Permissions_Roles)}
+            />
           </Box>
         </Box>
       </div>

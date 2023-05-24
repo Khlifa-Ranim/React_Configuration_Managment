@@ -12,14 +12,22 @@ import { useNavigate } from "react-router-dom";
 
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchRoles, fetchRole } from "../../../redux/RolesSlices/FetchRolesSlice";
+import {
+  fetchRoles,
+  fetchRole,
+} from "../../../redux/RolesSlices/FetchRolesSlice";
 import { deleteRoles } from "../../../redux/RolesSlices/DeleteRoleSlice";
-
- 
-
+import { Alert } from "react-bootstrap";
 
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+} from "@mui/material";
+
 
 const Roles = () => {
   const theme = useTheme();
@@ -35,19 +43,24 @@ const Roles = () => {
   const [showDetails, setShowDetails] = useState(false);
 
   const [searchTerm, setSearchTerm] = useState("");
+  const [showAlert, setShowAlert] = useState(false);
+
   console.log(searchTerm);
 
-
   const filteredRoless = roles.filter((role) => role.id);
-  console.log("filteredRoles",filteredRoless)
+  console.log("filteredRoles", filteredRoless);
 
-   const GetName=()=>{
+  const GetName = () => {
     const role = useSelector((state) => state.FetchRolsStore);
     const roles = role.Roles;
-   const Roless =roles.filter((role) =>role.name);
-    console.log("Roless",Roless)
- alert("all roles")
-  }
+    const Roless = roles.filter((role) => role.name);
+    console.log("Roless", Roless);
+    alert("all roles");
+  };
+
+  const sortedTabRoles= [...roles].sort(
+    (a, b) => b.id - a.id
+  );
 
   const filteredRoles = roles.filter((role) =>
     role.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -57,7 +70,7 @@ const Roles = () => {
     ? []
     : role.error
     ? []
-    : role.Roles.map((role, index) => ({
+    : sortedTabRoles.map((role, index) => ({
         id: role.id,
         name: role.name,
         description: role.description,
@@ -81,10 +94,7 @@ const Roles = () => {
 
   useEffect(() => {
     dispatch(fetchRoles());
-    if (roleDeleted) {
-      window.location.reload(); // trigger page refresh after role is deleted
-    }
-  }, [roleDeleted]); // run useEffect when roleDeleted changes
+  }, []);
 
   const FetchRole = (id) => {
     console.log("fetch one Role active");
@@ -95,36 +105,46 @@ const Roles = () => {
     navigate(`/FeachRoleId/${id}`);
   };
 
-  console.log(role.Roles); // <-- add this line to check the value of user.users
 
-  const DeleteRole = (id) => {
-    console.log("delete Role active");
-    notify(); // display toast notification
-    dispatch(deleteRoles(id))
-      .then(() => setRoleDeleted(true)) // set roleDeleted to true after successful deletion
-      .catch((error) => console.log(error));
+ 
+/************************delete************* */
+  const [showDialog, setShowDialog] = useState(false);
+  const [selectedRoleId, setSelectedRoleId] = useState(null);
+
+  const handleDelete = () => {
+    if (selectedRoleId) {
+      notify(); // display toast notification
+      dispatch(deleteRoles(selectedRoleId)).then((error) => console.log(error));
+      setShowAlert(true);
+      setShowDialog(false);
+    }
   };
 
-  const search = (roles) => {
-    // return roles.filter((role) =>role.name.toLowerCase().includes(searchTerm));
-    return roles.filter((role) =>
-      role.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  };
 
-  // useEffect(() => {
-  //   dispatch(GetName(searchTerm));
-  //   // dispatch(getData(data));
-  // }, [searchTerm, dispatch]);
+  const handleCancel = () => {
+    setShowDialog(false);
+  };
 
   const columns = [
-    { field: "id", headerName: "id", flex: 0.5 },
-    { field: "name", headerName: "name" },
+    { field: "id", headerName: "id", flex: 0.5},
+
+    {
+      field: "name",
+      headerName: "name",
+      cellClassName: "centered-cell",
+      flex: 0.5,
+      renderCell: (params) => (
+        <div style={{ fontSize: "14px" }}>{params.value}</div>
+      ),
+    },
     {
       field: "description",
       headerName: "description",
+      cellClassName: "centered-cell",
       flex: 1,
-      cellClassName: "name-column--cell",
+      renderCell: (params) => (
+        <div style={{ fontSize: "14px", color: "black" }}>{params.value}</div>
+      ),
     },
 
     {
@@ -132,6 +152,7 @@ const Roles = () => {
       headerName: "Access Level",
       flex: 1,
       renderCell: ({ row }) => {
+      
         return (
           <>
             <Button
@@ -142,15 +163,44 @@ const Roles = () => {
             >
               Read
             </Button>
+            <>
+              <Button
+                variant="contained"
+                color="secondary"
+                onClick={() =>{ setShowDialog(true);
+                  setSelectedRoleId(row.id);}
+                }
+                style={{ marginRight: "10px", backgroundColor: "#ff8585" }}
+              >
+                Delete
+              </Button>
 
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={() => DeleteRole(row.id)}
-              style={{ marginRight: "10px", backgroundColor: "#ff8585" }} // add margin-right inline style
-            >
-              Delete
-            </Button>
+              <Dialog open={showDialog} onClose={handleCancel}>
+                <DialogTitle
+                  style={{ fontSize: "20px", backgroundColor: "#ff8585" }}
+                >
+                  Are you sure you want to delete this role?
+                </DialogTitle>
+                <DialogContent style={{ fontSize: "18px" }}>
+                  Confirm Delete
+                </DialogContent>
+                <DialogActions>
+                  <Button
+                    style={{ marginRight: "10px", backgroundColor: "#A4A9FC" }}
+                    onClick={handleDelete}
+                    autoFocus
+                  >
+                    Delete
+                  </Button>
+                  <Button
+                    style={{ marginRight: "10px", backgroundColor: "#ff8585" }}
+                    onClick={handleCancel}
+                  >
+                    Cancel
+                  </Button>
+                </DialogActions>
+              </Dialog>
+            </>
             <Link to={`/EditRole/${row.id}`}>
               <Button
                 variant="contained"
@@ -175,7 +225,7 @@ const Roles = () => {
       <div className="content">
         <Topbar />
         <Box m="20px">
-          <Header title="Les Permissions" subtitle="Listes Des Permissions" />
+          <Header title="All Roles" subtitle="List Of Roles" />
 
           {/* <div>
  <input value={searchTerm}  onChange={(e)=>setSearchTerm(e.target.value)} type="text"  />
@@ -242,9 +292,7 @@ const Roles = () => {
             </div>
 
             <div>
-
               {/* <Roles_Permissions /> */}
-
 
               <Link to="/AddRole">
                 <Button

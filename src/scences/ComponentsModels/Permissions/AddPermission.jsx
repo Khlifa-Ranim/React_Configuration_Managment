@@ -9,6 +9,7 @@ import "../User/NewUser.css";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from "react-router-dom";
+import { Button } from "@mui/material";
 
 
 const AddPermission = () => {    
@@ -21,16 +22,17 @@ const AddPermission = () => {
   const [formErrors,setFromErrors]= useState({});
   const [isSubmit,setIsSubmit]= useState(false);
   const navigate=useNavigate();
+  const Navigate=useNavigate();
 
-   const notify=()=>{
-    toast(" Permission  Ajouter Avec Succès 👌")
-   }
+  //  const notify=()=>{
+  //   toast(" Permission  Ajouter Avec Succès 👌")
+  //  }
 
 
   const dispatch = useDispatch();
 
 
-const CreateUserHandle=(e)=>{
+const CreatePermissionHandel=(e)=>{
   e.preventDefault();
       setFromErrors(validate(endpoint,method,description));
       setIsSubmit(true);
@@ -39,16 +41,15 @@ if (Object.keys(formErrors).length === 0 && endpoint.trim() !== '' && descriptio
 
   console.table(endpoint,method,description)
   dispatch(CreatePermission({endpoint,method,description}))
-  notify(); // display toast notification
-  setTimeout(() => navigate('/FetchPermissions'), 2000); // redirect after 3 seconds
+  setTimeout(() => navigate('/FetchPermissions'), 800); // redirect after 3 seconds
 }
 }
+
 
 const validate = (endpoint, method, description) => {
   const errors = {};
 
   const endpoint_pattern = /^[a-zA-Z\s]*$/;
-  const method_pattern = /^(GET|PUT|DELETE|POST)$/;
   const description_pattern = /^[a-zA-Z\s'éèêàùîôç-]*$/;
 
   if (!endpoint) {
@@ -89,64 +90,84 @@ useEffect(() => {
      <Topbar/>
 
 
-      <form className="MainContainer2" onSubmit={CreateUserHandle}>
-      <ToastContainer />
-      <h2 className="WelcomeText">Créer Une Permission</h2>
-      <div className="InputContainer">
-      <label htmlFor="type">Select an Endpoint :</label>
-         <input
-         className="Input"
-          type="text" 
-          placeholder="EndPoint"
-          value={endpoint} 
-          onChange={(e) => {
-            const { name, value } = e.target;
-            setEndpoint(value);
-            setFromErrors({...formErrors, [name]: value});
-          }}
-                    
-       />
-      <p style={{color:"red"}}>{formErrors.endpoint}</p>
+ 
 
-             <label htmlFor="type">Select a Methoe :</label>
-             <select className="Input"
-                  onChange={(e) => {
-                    const { value } = e.target;
-                    setMethod(value);
-                    setFromErrors({ ...formErrors, type: value });
-                  }}>
-                    <option > </option>
+     <div className="container" style={{height:"200px", paddingTop:"80px",paddingBottom:"180px"}}>
+
+<form class="form">
+  <p class="title"> Create new permission</p>
+  <p class="message"> Add new permission </p>
+  <label>
+    <input
+      required=""
+      type="text"
+      class="input"
+      placeholder="EndPoint"
+      value={endpoint} 
+      onChange={(e) => {
+        const { name, value } = e.target;
+        setEndpoint(value);
+        setFromErrors({...formErrors, [name]: value});
+      }}
+    />
+    <span>Endpoint</span>
+    <p style={{color:"red"}}>{formErrors.endpoint}</p>
+  </label>
+
+
+
+  <label>
+  <label htmlFor="type">Select a Methoe :</label>
+    <select
+      required=""
+      type="text"
+      class="input"
+      onChange={(e) => {
+        const { value } = e.target;
+        setMethod(value);
+        setFromErrors({ ...formErrors, type: value });
+      }}
+    >
+             <option > </option>
                     <option > POST</option>
                     <option > GET</option>
                     <option > DELETE</option>
                     <option > PUT</option>
                     <option > PATCH</option>
-                </select>
+    </select>
+    <p style={{color:"red"}}>{formErrors.method}</p>
+  </label>
 
-         <p style={{color:"red"}}>{formErrors.method}</p>
-         <label htmlFor="type">Select a Description :</label>
-          <input
-         className="Input"
-         placeholder="Description"
-         type="text"
-          value={description}
-         onChange={(e) => {
-          const { name, value } = e.target;
-          setdDscription(value);
-          setFromErrors({...formErrors, [name]: value});
-        }}
-        />
-        <p style={{color:"red"}}>{formErrors.description}</p>
-      </div>
+  <label>
+    <input
+      required=""
+      type="text"
+      class="input"
+      value={description}
+      onChange={(e) => {
+       const { name, value } = e.target;
+       setdDscription(value);
+       setFromErrors({...formErrors, [name]: value});
+     }}
+    />
+    <span>Description</span>
+    <p style={{color:"red"}}>{formErrors.description}</p>
+  </label>
 
-      <div className="ButtonContainer">
-
-      <button  className="Button" type="submit" >Create Permission</button>    
-    
-      </div>
-
-      </form>
-
+  <div style={{marginLeft:"40px"}}>
+    <button class="submit" style={{width:"400px"}} onClick={CreatePermissionHandel}>
+Create Permission    </button>
+    <button
+      class="submit"
+      style={{ marginLeft: "20px", background: "gray" ,width:"400px"}}
+      onClick={() => {
+        Navigate("/FetchPermissions");
+      }}                >
+      Cancel{" "}
+    </button>
+  </div>
+</form>
+</div>
         </div>
         </div>
 

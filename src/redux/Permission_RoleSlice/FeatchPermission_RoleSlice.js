@@ -24,7 +24,8 @@ export const fetchRoles_permissions= createAsyncThunk("roles_permissions/fetchPe
   
     return response.data.map((roles_permissions) => {
       return {
-        // id: roles_permissions.id,
+        id: roles_permissions.role_id,
+        permission_ids: roles_permissions.permission_ids,
         permission_names: roles_permissions.permission_names,
         role_name: roles_permissions.role_name,
    

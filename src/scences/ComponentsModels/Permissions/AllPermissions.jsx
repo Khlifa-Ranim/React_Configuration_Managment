@@ -16,6 +16,12 @@ import { fetchPermission } from "../../../redux/PermissionSlices/FetchPermission
 
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+} from "@mui/material";
 
 const Permissions = () => {
   const theme = useTheme();
@@ -24,23 +30,28 @@ const Permissions = () => {
   const permissions = permission.Permissions;
   console.log(permissions);
 
+  const sortedTabPermissions= [...permissions].sort(
+    (a, b) => b.id - a.id
+  );
+
   const [searchTerm, setSearchTerm] = useState("");
   const rows = permission.loading
     ? []
     : permission.error
     ? []
-    : permission.Permissions.map((permission) => ({
+    : sortedTabPermissions.map((permission) => ({
         id: permission.id,
         description: permission.description,
         endpoint: permission.endpoint,
         method: permission.method,
       }));
 
-      const searchTermLowerCase = searchTerm.toLowerCase();
-      const filteredRows = rows.filter(row =>
-        row.endpoint.toLowerCase().includes(searchTermLowerCase) ||
-        row.method.toLowerCase().includes(searchTermLowerCase)
-      );
+  const searchTermLowerCase = searchTerm.toLowerCase();
+  const filteredRows = rows.filter(
+    (row) =>
+      row.endpoint.toLowerCase().includes(searchTermLowerCase) ||
+      row.method.toLowerCase().includes(searchTermLowerCase)
+  );
 
   const filter = permissions.filter((role) =>
     role.endpoint.toLowerCase().includes("ra")
@@ -62,31 +73,59 @@ const Permissions = () => {
 
   console.log(permission.Permissions); // <-- add this line to check the value of user.users
 
-  const DeletePermission = (id) => {
-    console.log("delete prmission active");
-    notify(); // display toast notification
-    dispatch(deletePermissions(id));
-  };
+  // const DeletePermission = (id) => {
+  //   notify(); // display toast notification
+  //   dispatch(deletePermissions(id));
+  // };
 
   const fetchPermissionn = (id) => {
     console.log("fetch one Role active");
     const selectedPermission = permissions.find((item) => item.id === id);
-    console.log("selectedPermission",selectedPermission);
+    console.log("selectedPermission", selectedPermission);
     dispatch(fetchPermission(id));
     // setShowDetails(true);
     navigate(`/FetchPermissionById/${id}`);
+  }
+
+  /**********************************Delete Button*************** */
+  const [showDialog, setShowDialog] = useState(false);
+  const [selectedRoleId, setSelectedRoleId] = useState(null);
+
+  const DeletePermission = () => {
+    if (selectedRoleId) {
+
+    notify(); // display toast notification
+    dispatch(deletePermissions(selectedRoleId)).then((error) => console.log(error));
+    // setShowAlert(true);
+    setShowDialog(false);
+
+
+    }
+  };
+
+  const handleCancel = () => {
+    setShowDialog(false);
   };
   const columns = [
     { field: "id", headerName: "id", flex: 0.5 },
-    { field: "description", headerName: "description",
-     flex: 1,
-    cellClassName: "name-column--cell",
-   },
     {
       field: "endpoint",
       headerName: "endpoint",
       flex: 1,
       cellClassName: "name-column--cell",
+      renderCell: (params) => (
+        <div style={{ fontSize: "14px", color: "black" }}>{params.value}</div>
+      ),
+    },
+
+    {
+      field: "description",
+      headerName: "description",
+      flex: 1,
+      cellClassName: "name-column--cell",
+      renderCell: (params) => (
+        <div style={{ fontSize: "14px" }}>{params.value}</div>
+      ),
     },
 
     { field: "method", headerName: "method" },
@@ -96,6 +135,15 @@ const Permissions = () => {
       headerName: "Access Level",
       flex: 1,
       renderCell: ({ row }) => {
+
+
+        const handleConfirm = () => {
+          setShowDialog(false);
+          DeletePermission(row.id);
+
+          
+        };
+
         return (
           <>
             <Button
@@ -107,14 +155,51 @@ const Permissions = () => {
               Read
             </Button>
 
-            <Button
+            {/* <Button
               variant="contained"
               color="secondary"
               onClick={() => DeletePermission(row.id)}
               style={{ marginRight: "10px", backgroundColor: "#ff8585" }} // add margin-right inline style
             >
               Delete
-            </Button>
+            </Button> */}
+            <>
+              <Button
+                variant="contained"
+                color="secondary"
+                onClick={() =>{ setShowDialog(true);
+                  setSelectedRoleId(row.id);}}
+                style={{ marginRight: "10px", backgroundColor: "#ff8585" }}
+              >
+                Delete
+              </Button>
+
+              <Dialog open={showDialog} onClose={handleCancel}>
+                <DialogTitle
+                  style={{ fontSize: "20px", backgroundColor: "#ff8585" }}
+                >
+                  Are you sure you want to delete this permission?
+                </DialogTitle>
+                <DialogContent style={{ fontSize: "18px" }}>
+                  Confirm Delete
+                </DialogContent>
+                <DialogActions>
+                  <Button
+                    style={{ marginRight: "10px", backgroundColor: "#A4A9FC" }}
+                    onClick={DeletePermission}
+                    autoFocus
+                  >
+                    Delete
+                  </Button>
+                  <Button
+                    style={{ marginRight: "10px", backgroundColor: "#ff8585" }}
+                    onClick={handleCancel}
+                  >
+                    Cancel
+                  </Button>
+                </DialogActions>
+              </Dialog>
+            </>
             <Link to={`/EditPermission/${row.id}`}>
               <Button
                 variant="contained"
@@ -137,7 +222,7 @@ const Permissions = () => {
       <div className="content">
         <Topbar />
         <Box m="20px">
-          <Header title="Les Permissions" subtitle="Listes Des Permissions" />
+          <Header title="All Permissions" subtitle="List Of Permissions" />
           <Box
             m="40px 0 0 0"
             height="75vh"
@@ -214,10 +299,9 @@ const Permissions = () => {
                   transition: "all 0.2s ease-in-out",
                   display: "flex",
                   justifyContent: "center",
-                }}// add margin-right inline style
+                }} // add margin-right inline style
               >
-                AJOUTER UNE PERMISSION
-              </Button>
+Add Permission              </Button>
             </Link>
             <DataGrid
               columns={columns}

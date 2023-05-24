@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Topbar from "../../global/Topbar";
 import Sidebar from "../../global/Sidebar";
 import { useDispatch, useSelector } from 'react-redux';
-import {CreateTypesUsres,addRole}  from'../../../redux/Types_UsersSlices/AddTypesUsers'
+import {CreateTypesUsres}  from'../../../redux/Types_UsersSlices/AddTypesUsers'
 import "../User/NewUser.css";
 import { useNavigate } from "react-router-dom";
 

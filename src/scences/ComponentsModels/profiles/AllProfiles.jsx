@@ -6,11 +6,15 @@ import { useTheme } from "@mui/material";
 import Topbar from "../../global/Topbar";
 import Sidebar from "../../global/Sidebar";
 import "../../../index.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchProfiles } from "../../../redux/ProfileSlices/FetchProfileSlice";
+import {
+  fetchProfiles,
+  featchProfileById,
+} from "../../../redux/ProfileSlices/FetchProfileSlice";
+import { deleteProfile } from "../../../redux/ProfileSlices/DeleteProfile_Slice";
 
 const Profiles = () => {
   const theme = useTheme();
@@ -18,15 +22,24 @@ const Profiles = () => {
 
   const dispatch = useDispatch();
   const profile = useSelector((state) => state.FetchProfilessStore);
-  const users = useSelector((state) => console.log(state.FetchProfilessStore));
+  const Profile = profile.profiles;
+  console.log("Profiles:", profile.profiles);
+  console.log("Profiles:", Profile);
+  console.log("adresse:", Profile.adresse);
 
+  const [roleDeleted, setRoleDeleted] = useState(false); // state variable to keep track of deleted role
 
+  const navigate = useNavigate();
+
+  const sortedTabProfile= [...Profile].sort(
+    (a, b) => b.id - a.id
+  );
   const [searchTerm, setSearchTerm] = useState("");
   const rows = profile.loading
     ? []
     : profile.error
     ? []
-    : profile.profiles.map((profile) => ({
+    : sortedTabProfile.map((profile) => ({
         id: profile.id,
         adresse: profile.adresse,
         description: profile.description,
@@ -34,14 +47,15 @@ const Profiles = () => {
         telephone: profile.telephone,
         email: profile.email,
         user_id: profile.user_id,
+        image: profile.image,
       }));
 
-
-      const searchTermLowerCase = searchTerm.toLowerCase();
-      const filteredRows = rows.filter(row =>
-        row.name.toLowerCase().includes(searchTermLowerCase) ||
-        row.email.toLowerCase().includes(searchTermLowerCase)
-      );
+  const searchTermLowerCase = searchTerm.toLowerCase();
+  const filteredRows = rows.filter(
+    (row) =>
+      row.name.toLowerCase().includes(searchTermLowerCase) ||
+      row.email.toLowerCase().includes(searchTermLowerCase)
+  );
 
   useEffect(() => {
     dispatch(fetchProfiles());
@@ -50,17 +64,49 @@ const Profiles = () => {
 
   console.log(profile.profiles); // <-- add this line to check the value of profile.uprofiles
 
+  const FetchProfile = (id) => {
+    console.log("fetch one Role active");
+    const selectedProfile = Profile.find((item) => item.id === id);
+    console.log(selectedProfile);
+    dispatch(featchProfileById(id));
+    navigate(`/FeachProfileId/${id}`);
+  };
+
+  const DeleteProfile = (id) => {
+    console.log("delete Profile active");
+    dispatch(deleteProfile(id))
+      .then(() => setRoleDeleted(true)) // set roleDeleted to true after successful deletion
+      .catch((error) => console.log(error));
+  };
+
   const columns = [
     {
       field: "user_id",
       headerName: "User_Id",
       flex: 1,
       cellClassName: "name-column--cell",
+      hide: true,
+    },
+
+    {
+      field: "name",
+      headerName: "Name",
+      flex: 1,
+      cellClassName: "name-column--cell",
       renderCell: (params) => (
-        <div style={{ fontSize: "14px" }}>{params.value}</div>
+        <div style={{ fontSize: "14px", color: "black" }}>{params.value}</div>
       ),
     },
 
+    {
+      field: "email",
+      headerName: "Email",
+      flex: 1,
+      cellClassName: "name-column--cell",
+      renderCell: (params) => (
+        <div style={{ fontSize: "14px", color: "black" }}>{params.value}</div>
+      ),
+    },
     { field: "adresse", headerName: "Adresse" },
     {
       field: "description",
@@ -69,20 +115,15 @@ const Profiles = () => {
       cellClassName: "name-column--cell",
     },
     {
-      field: "name",
-      headerName: "Nom",
+      field: "image",
+      headerName: "Image",
       flex: 1,
       cellClassName: "name-column--cell",
     },
+
     {
       field: "telephone",
-      headerName: "Télephone",
-      flex: 1,
-      cellClassName: "name-column--cell",
-    },
-    {
-      field: "email",
-      headerName: "Email",
+      headerName: "Telephone",
       flex: 1,
       cellClassName: "name-column--cell",
     },
@@ -93,34 +134,25 @@ const Profiles = () => {
       flex: 1,
       cellClassName: "name-column--cell",
 
-      renderCell: ({ row: { access } }) => {
+      renderCell: ({ row }) => {
         return (
           <>
             <Button
               variant="contained"
               color="secondary"
+              onClick={() => FetchProfile(row.id)}
+              style={{ marginRight: "10px", backgroundColor: "#a8e6cf" }} // add margin-right inline style
+            >
+              Read
+            </Button>
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={() => DeleteProfile(row.id)}
               style={{ backgroundColor: "#FFC0CB" }} // add margin-right inline style
             >
               Delete
             </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              // onClick={() => handleEdit(row.id)}
-              style={{ marginRight: "10px" }} // add margin-right inline style
-            >
-              Edit
-            </Button>
-            <Link to="/NewProfile">
-              <Button
-                className="button"
-                variant="contained"
-                color="secondary"
-                style={{ marginRight: "10px" }} // add margin-right inline style
-              >
-                Add
-              </Button>
-            </Link>
           </>
         );
       },
@@ -133,7 +165,7 @@ const Profiles = () => {
       <div className="content">
         <Topbar />
         <Box m="20px">
-          <Header title="Les Profiles" subtitle="Listes Des Profiles" />
+          <Header title="All Profiles" subtitle="List Of All Profiles" />
           <Box
             m="40px 0 0 0"
             height="75vh"
@@ -166,8 +198,7 @@ const Profiles = () => {
               },
             }}
           >
-
-       <div style={{ position: "relative" }}>
+            <div style={{ position: "relative" }}>
               <input
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -189,6 +220,32 @@ const Profiles = () => {
                 placeholder="Search with Name Or Email..."
               />
             </div>
+            {/* <Link to="/NewProfile">
+              <Button
+                className="button"
+                variant="contained"
+                  color="secondary"
+                  style={{
+                    marginLeft: "400px",
+                    height: "44px",
+                    width: "40%",
+                    backgroundColor: "#86f3b8",
+                    marginTop: "14px",
+                    fontSize: "11px",
+                    fontFamily: "Arial",
+                    fontWeight: "bold",
+                    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)",
+                    borderRadius: "4px",
+                    textTransform: "uppercase",
+                    letterSpacing: "1px",
+                    transition: "all 0.2s ease-in-out",
+                    display: "flex",
+                    justifyContent: "center",
+                  }}
+              >
+                Add a New Profile
+              </Button>
+            </Link> */}
             <DataGrid
               rows={filteredRows}
               columns={columns}

@@ -1,4 +1,3 @@
-
 import { Box, Button } from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { tokens } from "../../../theme";
@@ -13,24 +12,41 @@ import { useNavigate } from "react-router-dom";
 
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchRoles_permissions } from "../../../redux/Permission_RoleSlice/FeatchPermission_RoleSlice";
-import { deleteRolePermissions } from "../../../redux/Permission_RoleSlice/DeletePermissionRolesSlice";
+import {
+  fetchRoles_permissions,
+  fetchRolesPermission,
+} from "../../../redux/Permission_RoleSlice/FeatchPermission_RoleSlice";
+import { deleteRolesPermissions } from "../../../redux/Permission_RoleSlice/DeleteRole_PermissionsSlise";
+import { deleteRoles } from "../../../redux/RolesSlices/DeleteRoleSlice";
 
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { v4 as uuidv4 } from 'uuid';
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+} from "@mui/material";
+
 
 const Role_Permission = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+
+  const [roleDeleted, setRoleDeleted] = useState(false); // state variable to keep track of deleted role
   const navigate = useNavigate();
 
   const dispatch = useDispatch();
-  const role_permission = useSelector((state) => state.FetchRoles_PermissionsStore);
+  const role_permission = useSelector(
+    (state) => state.FetchRoles_PermissionsStore
+  );
   console.log("role_permissionsss:", role_permission.Permissions_Roles);
   const roles_permissions = role_permission.Permissions_Roles;
 
-
+  
+  const sortedTabRoles_Permissions= [...roles_permissions].sort(
+    (a, b) => b.id - a.id
+  );
   const notify = () => {
     toast(" Delete succeed  👌");
   };
@@ -40,106 +56,146 @@ const Role_Permission = () => {
   }, []);
 
   console.log(role_permission.Permissions_Roles); // <-- add this line to check the value of user.users
-  
-  
-  const fetchPermissionn = (id, roles_permissions) => {
+
+  const fetchPermissionn = (id) => {
     console.log("fetch one Role active");
     console.log("roles_permissions:", roles_permissions); // add this line to check the value of roles_permissions
-    const selectedPermission = roles_permissions.find((item) => item.permission_names);
+    const selectedPermission = roles_permissions.find((item) =>  item.id === id);
     console.log("selectedPermission", selectedPermission);
-    // dispatch(fetchRolesPermission(id));
+    dispatch(fetchRolesPermission(id));
     navigate(`/FetchRolesPermissionById/${id}`);
   };
-
 
   const getRowId = (row, index) => {
     return (index + 1).toString();
   };
 
-  const DeleteRolePermissions = (id) => {
+  const DeleteRolesPermissionss = (id, permission_ids) => {
     console.log("delete roleprmission active");
-    notify(); // display toast notification
-    dispatch(deleteRolePermissions(id));
+    // notify(); // display toast notification
+    // dispatch(deleteRolesPermissions(id,permission_ids));
+    console.log("id,permission_ids", id, permission_ids);
     // navigate("/FetchRoles");
-
   };
 
+  /************delete***************** */
+  const [showDialog, setShowDialog] = useState(false);
+  const DeleteRole = (id) => {
+    console.log("delete Role active");
+    notify(); // display toast notification
+    dispatch(deleteRoles(id))
+      .then(() => setRoleDeleted(true)) // set roleDeleted to true after successful deletion
+      .catch((error) => console.log(error));
+  };
+
+  
+  const handleCancel = () => {
+    setShowDialog(false);
+  };
+
+  /******************search******************** */
   const [searchTerm, setSearchTerm] = useState("");
   console.log(searchTerm);
 
   const filteredRoless = roles_permissions.filter((role) => role.id);
-  console.log("filteredRoles",filteredRoless)
+  console.log("filteredRoles", filteredRoless);
 
+  const rows = sortedTabRoles_Permissions.loading
+    ? []
+    : role_permission.error
+    ? []
+    : role_permission.Permissions_Roles.map((roles_permissions, index) => ({
+        ...roles_permissions,
+        // id: getRowId(roles_permissions, index),
+      }));
 
-  const rows = 
-              role_permission.loading
-              ? []
-              : role_permission.error
-              ? []
-              : role_permission.Permissions_Roles.map((roles_permissions, index) => ({
-                  ...roles_permissions,
-                  id: roles_permissions.role_name,
-                  // id: getRowId(roles_permissions, index),
-
-              }));
-
-const filteredRows = rows.filter((row) =>
-row.role_name.toLowerCase().includes(searchTerm.toLowerCase())
-);
-console.log(filteredRows);
-
+  const filteredRows = rows.filter((row) =>
+    row.role_name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+  console.log(filteredRows);
 
   const columns = [
-    { field: "id", headerName: "id", flex: 0.5 },
+    { field: "id", headerName: "id", flex: 0.5, hide: true },
+
     {
-        field: "role_name",
-        headerName: "role_name",
-        flex: 1,
-        cellClassName: "name-column--cell",
-      },
-  
-    { field: "permission_names",
-   headerName: "permission_names" ,
-    flex: 1,
-    cellClassName: "name-column--cell",},
-  
+      field: "role_name",
+      headerName: "role_name",
+      flex: 1,
+      cellClassName: "name-column--cell",
+      renderCell: (params) => (
+        <div style={{ fontSize: "14px", color: "black" }}>{params.value}</div>
+      ),
+    },
+
+    {
+      field: "permission_names",
+      headerName: "permission_names",
+      flex:2,
+      cellClassName: "name-column--cell",
+      renderCell: (params) => (
+        <div style={{ fontSize: "14px", color: "black" }}>{params.value}</div>
+      ),
+    },
+
     {
       field: "accessLevel",
       headerName: "Access Level",
       flex: 1,
       renderCell: ({ row }) => {
-        
+
+        const handleConfirm = () => {
+          setShowDialog(false);
+          DeleteRole(row.id);
+        };
         return (
           <>
-              <Button
+            <Button
               variant="contained"
               color="secondary"
-              onClick={() => fetchPermissionn(row.id)}
+              onClick={() =>
+                fetchPermissionn(row.id)
+              }
               style={{ marginRight: "10px", backgroundColor: "#a8e6cf" }} // add margin-right inline style
             >
               Read
             </Button>
 
-            <Button
-              variant="contained"
-              color="secondary"
-              onClick={() => DeleteRolePermissions(row.id)}
-              style={{ marginRight: "10px", backgroundColor: "#FFC0CB" }} // add margin-right inline style
-            >
-              Delete
-            </Button>
-            <Link to={`/EditRole/${row.id}`}>
+            <>
               <Button
                 variant="contained"
-                color="primary"
-                onClick={() => {
-                  // setId(row.id)
-                }}
-                style={{ marginRight: "10px" }} // add margin-right inline style
+                color="secondary"
+                onClick={() => setShowDialog(true)}
+                style={{ marginRight: "10px", backgroundColor: "#ff8585" }}
               >
-                Edit
+                Delete
               </Button>
-            </Link>
+
+              <Dialog open={showDialog} onClose={handleCancel}>
+                <DialogTitle
+                  style={{ fontSize: "20px", backgroundColor: "#ff8585" }}
+                >
+                  Are you sure you want to delete this Permissions role relation?
+                </DialogTitle>
+                <DialogContent style={{ fontSize: "18px" }}>
+                  Confirm Delete
+                </DialogContent>
+                <DialogActions>
+                  <Button
+                    style={{ marginRight: "10px", backgroundColor: "#A4A9FC" }}
+                    onClick={handleConfirm}
+                    autoFocus
+                  >
+                    Delete
+                  </Button>
+                  <Button
+                    style={{ marginRight: "10px", backgroundColor: "#ff8585" }}
+                    onClick={handleCancel}
+                  >
+                    Cancel
+                  </Button>
+                </DialogActions>
+              </Dialog>
+            </>
           </>
         );
       },
@@ -152,10 +208,10 @@ console.log(filteredRows);
       <div className="content">
         <Topbar />
         <Box m="20px">
-        <Header
-        title="List of permissions affect to a specific role"
-        subtitle="List of Permissions for  to a specific role"
-      />
+          <Header
+            title="List of permissions affect to a specific role"
+            subtitle="List of Permissions for  to a specific role"
+          />
 
           <Box
             m="40px 0 0 0"
@@ -212,7 +268,7 @@ console.log(filteredRows);
                 placeholder="Search With Roles Name..."
               />
             </div>
-            <Link to="/Roles_Permissions">
+            <Link to="/AddPerRoles">
               <Button
                 className="button"
                 variant="contained"
@@ -220,7 +276,7 @@ console.log(filteredRows);
                 style={{
                   marginLeft: "400px",
                   height: "44px",
-                  width: "40%",
+                  width: "44%",
                   backgroundColor: "#86f3b8",
                   marginTop: "14px",
                   fontSize: "11px",
@@ -235,19 +291,46 @@ console.log(filteredRows);
                   justifyContent: "center",
                 }} // add margin-right inline style
               >
-                Add permissions to a specific Role +
+                Add One permission to a specific Role +
+              </Button>
+            </Link>
+            <Link to="/Roles_Permissions">
+              <Button
+                className="button"
+                variant="contained"
+                color="secondary"
+                style={{
+                  marginLeft: "400px",
+                  height: "44px",
+                  width: "44%",
+                  backgroundColor: "#86f3b8",
+                  marginTop: "14px",
+                  fontSize: "11px",
+                  fontFamily: "Arial",
+                  fontWeight: "bold",
+                  boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)",
+                  borderRadius: "4px",
+                  textTransform: "uppercase",
+                  letterSpacing: "1px",
+                  transition: "all 0.2s ease-in-out",
+                  display: "flex",
+                  justifyContent: "center",
+                }} // add margin-right inline style
+              >
+                Add Many permissions to a specific Role +
               </Button>
             </Link>
 
-<DataGrid
-  rows={filteredRows}
-  columns={columns}
-  components={{ Toolbar: GridToolbar }}
-  // getRowId={(row) => row.role_name}
-  getRowId={(row) => row.id}
-
-  onRowClick={(row) => fetchPermissionn(row.id, role_permission.Permissions_Roles)}/>
-
+            <DataGrid
+              rows={filteredRows}
+              columns={columns}
+              components={{ Toolbar: GridToolbar }}
+              // getRowId={(row) => row.role_name}
+              getRowId={(row) => row.id}
+              // onRowClick={(row) =>
+              //   fetchPermissionn(row.id, role_permission.Permissions_Roles)
+              // }
+            />
           </Box>
         </Box>
       </div>

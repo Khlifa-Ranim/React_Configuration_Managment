@@ -1,4 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import jwt_decode from "jwt-decode";
 
 export const deleteUsers = createAsyncThunk(
   "user/deleteUser",
@@ -12,6 +13,20 @@ export const deleteUsers = createAsyncThunk(
         },
       });
       if (response.status === 200) {
+        const log = await fetch("http://localhost:5000/logs", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify({
+            action: `${
+              jwt_decode(localStorage.getItem("token")).username
+            } Deleted User with id: ${id}`,
+          }),
+        });
+        // Refresh the page
+        window.location.reload();
         return "User deleted successfully";
       } else if (response.status === 202) {
         return "Nothing deleted";
@@ -20,7 +35,9 @@ export const deleteUsers = createAsyncThunk(
       } else if (response.status === 403) {
         throw new Error("Forbidden - User does not have necessary roles");
       } else if (response.status === 404) {
-        throw new Error("Not Found - Endpoint not found or invalid permissions");
+        throw new Error(
+          "Not Found - Endpoint not found or invalid permissions"
+        );
       } else {
         throw new Error("Internal Server Error");
       }
@@ -34,7 +51,7 @@ const DeleteUserSlice = createSlice({
   name: "DeleteUser",
   initialState: {
     isLoding: false,
-    error: null
+    error: null,
   },
 
   extraReducers: {
@@ -45,15 +62,14 @@ const DeleteUserSlice = createSlice({
     [deleteUsers.fulfilled]: (state, action) => {
       state.isLoding = false;
       state.users = state.users.filter((el) => el.id !== action.payload);
-      console.log(state.users)
+      console.log(state.users);
     },
     [deleteUsers.rejected]: (state, action) => {
       state.isLoding = false;
       state.error = action.payload;
-    }
-  }
-
+    },
+  },
 });
 
 export default DeleteUserSlice.reducer;
-export const {  removeUser } = DeleteUserSlice.actions;
+export const { removeUser } = DeleteUserSlice.actions;

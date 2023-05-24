@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import {editPermission}  from'../../../redux/PermissionSlices/EditPermissionSlice'
 import "../User/NewUser.css";
 import { useNavigate, useParams } from "react-router-dom";
+import { Box, Button, TextField, useTheme } from "@mui/material";
 
 
 import { ToastContainer, toast } from 'react-toastify';
@@ -16,7 +17,7 @@ const EditPermission = () => {
   const permission = useSelector((state) => state.FetchPermissionStore);
 
 
-  const navigate=useNavigate();
+  const Navigate=useNavigate();
 
   const dispatch = useDispatch();
 
@@ -49,7 +50,7 @@ const EditPermissionHandle=(e)=>{
 
   dispatch(editPermission({id:id,endpoint:uEndpoint,method:uMethod,description:uDescription}))
   notify(); // display toast notification
-  setTimeout(() => navigate("/FetchPermissions"), 200); // redirect after 3 seconds
+  setTimeout(() => Navigate("/FetchPermissions"), 200); // redirect after 3 seconds
 
 }
 }
@@ -103,82 +104,85 @@ useEffect(() => {
      <Topbar/>
 
 
-      <form className="MainContainer2">
-      <h2 className="WelcomeText">Modifier  Permission</h2>
-      <div className="InputContainer">
-         <input
-         className="Input"
-          type="text" 
-          placeholder="EndPoint"
+          <div className="container" style={{ paddingTop:"80px",paddingBottom:"180px"}}>
+
+<form class="form">
+  <p class="title"> Edit Permission</p>
+  <label>
+    <input
+      required=""
+      type="text"
+      class="input"
+      placeholder="EndPoint"
           value={uEndpoint} 
           onChange={(e) => {
             const { name, value } = e.target;
             setUEndpoint(value);
             setFromErrors({...formErrors, [name]: value});
           }}
-          
-       />
-        <p style={{color:"red"}}>{formErrors.uEndpoint}</p>
+    />
+    <span>Endpoint</span>
+    <p style={{color:"red"}}>{formErrors.uEndpoint}</p>
+  </label>
 
 
-        {/* <input
-         className="Input"
-         type="text" 
-         value={uMethod}
-         placeholder="Methode"
-         onChange={(e) => {
-          const { name, value } = e.target;
-          setUMethod(value);
-          setFromErrors({...formErrors, [name]: value});
-        }}
-        /> */}
-               <select className="Input"
-                   value={uMethod}
-                  onChange={(e) => {
-                    const { name, value } = e.target;
-                    setUMethod(value);
-                    setFromErrors({...formErrors, [name]: value});
-                  }}>
-                  <option > </option>
-                   <option > POST</option>
+
+  <label>
+  <label htmlFor="type">Select a Methoe :</label>
+    <select
+      required=""
+      type="text"
+      class="input"
+      value={uMethod}
+      onChange={(e) => {
+        const { name, value } = e.target;
+        setUMethod(value);
+        setFromErrors({...formErrors, [name]: value});
+      }}
+    >
+             <option > </option>
+                    <option > POST</option>
                     <option > GET</option>
                     <option > DELETE</option>
                     <option > PUT</option>
                     <option > PATCH</option>
-                </select>
-               <p style={{color:"red"}}>{formErrors.uMethod}</p>
+    </select>
+    <p style={{color:"red"}}>{formErrors.uMethod}</p>
+  </label>
 
-          <input
-         className="Input"
-         placeholder="Description"
-         type="text"
-          value={uDescription}
+  <label>
+    <input
+      required=""
+      type="text"
+      class="input"
+      value={uDescription}
           onChange={(e) => {
             const { name, value } = e.target;
             setUDscription(value);
             setFromErrors({...formErrors, [name]: value});
           }}
-        />
-         <p style={{color:"red"}}>{formErrors.uDescription}</p>
+    />
+    <span>Description</span>
+    <p style={{color:"red"}}>{formErrors.uDescription}</p>
+  </label>
 
-      </div>
-
-      <div className="ButtonContainer">
-
-      <button  
-      className="Button" 
-      type="submit" 
-      onClick={EditPermissionHandle}
-      >Modifier Permission</button>    
-    
-      </div>
-
-      </form>
-
+  <div style={{marginLeft:"40px"}}>
+    <button class="submit" style={{width:"400px"}} onClick={EditPermissionHandle}>
+Edit Permission   </button>
+    <button
+      class="submit"
+      style={{ marginLeft: "20px", background: "gray" ,width:"400px"}}
+      onClick={() => {
+        Navigate("/FetchPermissions");
+      }}                >
+      Cancel{" "}
+    </button>
+  </div>
+</form>
         </div>
         </div>
 
-
+</div>
     
   </>
   );

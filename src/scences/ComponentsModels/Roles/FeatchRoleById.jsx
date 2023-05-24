@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import "../User/NewUser.css";
 
 
@@ -20,7 +20,7 @@ function FeatchRoleById() {
   const role = roles.find((item) => item.id === roleId);
   console.log("roleid:", role);
   
-
+  const navigate=useNavigate();
 
 
 
@@ -32,33 +32,24 @@ function FeatchRoleById() {
      <div  className="content">
      <Topbar/>
     <div className="MainContainer2">
-    <h2 className="WelcomeText">Role Details</h2>
+      <div>
+      <button onClick={() => navigate(`/FetchRoles`)} style={{marginLeft:"200px"}}className="back-btn">
+              Back
+            </button>
+    <button onClick={() => navigate(`/FeatchRole_Permission`)} style={{background:"#7980F9"}} className="back-btn">
+              More information about roles
+            </button>
+          </div>
+    <h2 className="WelcomeText" style={{color:"#7980F9",marginBottom:"2px"}}>Role Details</h2>
     <div className="InputContainer">
-      <p>Name: {name}</p>
-      <p>Description: {description}</p>
+      <p style={{ color: "#ff347f"}}>Name: </p>{name}
+      <p style={{ color: "#ff347f"}}>Description: </p>{description}
     </div>
     </div>
 
     </div>
     </div>
 
-
-//     <div>
-//     <h2>Liste des Roles </h2>
-//    {role.loading && <div>Chargement.....</div>}
-//    {!role.loading && role.error ? <div>Erreur: {role.error}</div> : null}
-//    {!role.loading && roles && roles.length ? (
-//      <ul>
-//        {roles.map((role) => (
-//          <li>
-//            <p>name: {role.name}</p>
-//            <p>description: {role.description}</p>
-
-//          </li>
-//        ))}
-//      </ul>
-//    ) : null}
-//  </div>
 
   );
 }

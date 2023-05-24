@@ -1,177 +1,103 @@
- import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import jwt_decode from "jwt-decode";
+import { message } from "antd";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
- const initialState={
+
+
+const initialState = {
   permission: "",
-    loading: false,
-    error: null,
-   // token: localStorage.getItem("token") // initialize the token from the local storage
-  }
+  loading: false,
+  error: null,
+  // token: localStorage.getItem("token") // initialize the token from the local storage
+};
 
- export const CreatePermission = createAsyncThunk(
-    "permission/CreatePermission",
-    async (permission, { rejectWithValue }) => {
-      try {
-        const response = await fetch("http://localhost:5000/permissions", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${localStorage.getItem("token")}`,
-          },
-          body: JSON.stringify(permission),
-        });
-  
-        if (!response.ok) {
-          const { error } = await response.json();
-          return rejectWithValue(error);
-        }
-  
-        // const { token } = await response.json();
-        // localStorage.setItem("token", token); // dispatch addToken action
-      } catch (error) {
-        return rejectWithValue(error.message);
+export const CreatePermission = createAsyncThunk(
+  "permission/CreatePermission",
+  async (permission, { rejectWithValue }) => {
+
+    try {
+      const response = await fetch("http://localhost:5000/permissions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify(permission),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+             /**************msg error */
+             message.error(data.message);
+             const { error } = await response.json();
+        return rejectWithValue(error);
       }
-    }
-  );
+      else {toast.success("Permission added successfully");
+     
+             // ADD LOG
+      const log = await fetch("http://localhost:5000/logs", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({
+          action: `${
+            jwt_decode(localStorage.getItem("token")).username
+          } added permission with endpoint: ${
+            permission.endpoint
+          } and method: ${permission.method}`,
+        }),
 
-  
+      });
+        return data;
+        
+      }
+
+     
+      
+    } catch (error) {
+      toast.error(error.message, {
+        position: toast.POSITION.TOP_RIGHT,
+        // autoClose: 5000,
+        // hideProgressBar: true,
+        // closeOnClick: true,
+        // pauseOnHover: true,
+        // draggable: true,
+        // progress: undefined,
+      });
+      return rejectWithValue(error.message);
+    }
+  }
+);
 
 const CreatePermissionSlice = createSlice({
-    name: 'permission',
-    initialState:{
-      permission: "",
-      loading: false,
-      error: null,
-     // token: localStorage.getItem("token") // initialize the token from the local storage
-    }
-  ,
+  name: "permission",
+  initialState: {
+    permission: "",
+    loading: false,
+    error: null,
+    success: false, // add success state
+  },
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(CreatePermission.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(CreatePermission.fulfilled, (state, action) => {
+        state.loading = false;
+        state.permission = action.payload.permission;
+        state.success = true; // set success to true on successful API call
+      })
+      .addCase(CreatePermission.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      });
+  },
+});
 
-    reducers: {
-       
-    },
-    extraReducers: (builder) => {
-      builder
-        .addCase(CreatePermission.pending, (state) => {
-          state.loading = true;
-        })
-        .addCase(CreatePermission.fulfilled, (state, action) => {
-          state.loading = false;
-          state.permission = action.payload.permission;
-          //state.token = action.payload.token;
-        })
-        .addCase(CreatePermission.rejected, (state, action) => {
-          state.loading = false;
-          state.error = action.error.message;
-      
-        });
-    },
-  });
-  
-  export default CreatePermissionSlice.reducer; 
-// const initialState = {
-  
-//   token: token,
-//   isAuthenticated: `Bearer ${token ? 'true' : 'false'}`,
-//   username: '',
-//   password: '',
-//   loading: false,
-//   error: null,
-// };
- 
-//     //*******************FUNCTION--CreateUser********************/
-
-//     // export const CreateUser=createAsyncThunk("CreateUser",async(body)=>{
-//     //   const res= await fetch("http://localhost:5000/users",{
-//     //     method:"post",
-//     //     headers:{
-//     //       'Content-Type': 'application/json'
-//     //       //'Authorization': `Bearer ${token}`
-
-
-//     //     },
-//     //     body: JSON.stringify(body),
-
-//     //   })
-//     //   return await res.json();
-//     // })
-
-//         export const CreateUser = createAsyncThunk(
-//       "CreateUser",
-//       async (body, { getState }) => {
-//         const { token } = getState().user; // Get the token from the state
-//         const res = await fetch("http://localhost:5000/users", {
-//           method: "post",
-//           headers: {
-//             "Content-Type": "application/json",
-//             Authorization: `Bearer ${token}`, // Add the token to the headers
-//           },
-//           body: JSON.stringify(body),
-//         });
-//         return await res.json();
-//       }
-//     );
-
-
-
-
-// const CreateUserSlice = createSlice({
-//   name: "user",
-//   initialState,
-//   reducers: {
-//     addToken: (state, action) => {
-//       state.token = localStorage.getItem("token");
-//     },
-
-//     addUser: (state, action) => {
-//       state.user = JSON.parse(localStorage.getItem("user"));
-//     },
-    
-//     logout: (state, action) => {
-//       state.token = null;
-//       state.expirationTime = null;
-//       localStorage.clear();
-//     },
-//   },
-//   extraReducers: {
-  
-//         //*******************CreateUser********************/
-//         [CreateUser.pending]: (state, action) => {
-//           state.loding = true;
-//           state.isAuthenticated = false;
-//         },
-//         [CreateUser.fulfilled]: (
-//           state,
-//           { payload: { error, msg, token, user,username,password} }
-//         ) => {
-//           state.loding = false;
-//           state.isAuthenticated = true;
-//           if (error) {
-//             state.error = error;
-//           } else {
-//             state.msg = msg;
-//             state.token = token;
-//             state.user = user;
-//             state.username=username;
-//             state.password=password;
-    
-//             localStorage.setItem("msg", msg);
-//             localStorage.setItem("user", JSON.stringify(user));
-//             localStorage.setItem("token", token);
-    
-//             // set expiration time to one hour from now
-//             const expirationTime = new Date().getTime() + 60 * 60 * 1000; // one hour in milliseconds
-//             state.expirationTime = expirationTime;
-//             localStorage.setItem("expirationTime", expirationTime);
-//           }
-//         },
-//         [CreateUser.rejected]: (state, action) => {
-//           state.loding = true;
-//           state.isAuthenticated = false;
-//         },
-    
-
-
-//   },
-// });
-
-// export const { addToken, addUser, logout } = AuthSlice.actions;
-// export default CreateUserSlice.reducer;
+export default CreatePermissionSlice.reducer;

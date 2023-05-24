@@ -29,6 +29,7 @@ export const fetchPermissions= createAsyncThunk("permission/fetchPermissions", a
         description: permission.description,
         endpoint: permission.endpoint,
         method: permission.method,
+        permission_names:permission.permission_names
 
 
   };

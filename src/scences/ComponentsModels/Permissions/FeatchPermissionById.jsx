@@ -1,7 +1,7 @@
 
 import React from 'react';
 import {  useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import "../User/NewUser.css";
 
 
@@ -27,7 +27,7 @@ function FetchPermissionById() {
 
   console.log("roleid:", permission);
   
-
+const navigate=useNavigate();
 
 
 
@@ -38,14 +38,22 @@ function FetchPermissionById() {
     <Sidebar/> 
      <div  className="content">
      <Topbar/>
-    <div className="MainContainer2">
-    <h2 className="WelcomeText">Permission Details</h2>
+    <div className="MainContainer2" >
+    <div>
+      <button onClick={() => navigate(`/FetchRoles`)} style={{marginLeft:"100px"}}className="back-btn">
+              Back
+            </button>
+    <button onClick={() => navigate(`/FeatchRole_Permission`)} style={{background:"#7980F9"}} className="back-btn">
+              More information about permissions role
+            </button>
+          </div>
+    <h2 className="WelcomeText" style={{color:"#7980F9", marginBottom:"4px"}}>Permission Details</h2>
     <div className="InputContainer">
      {permission.loading && <div>Chargement.....</div>}
 
-      <p>endpoint: {endpoint}</p>
-      <p>Description: {description}</p>
-      <p>method: {method}</p>
+      <p style={{ color: "#ff347f"}}>Endpoint: </p> {endpoint}
+      <p style={{ color: "#ff347f"}}>Description: </p>{description}
+      <p style={{ color: "#ff347f"}}>Method: </p> {method}
 
     </div>
     </div>

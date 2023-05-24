@@ -24,6 +24,8 @@ export const fetchUsers_Roles= createAsyncThunk("users_roles/fetchusers_roles", 
   
     return response.data.map((UsersRoles) => {
       return {
+        roles_ids:UsersRoles.roles_ids,
+        id: UsersRoles.username_id,
         roles_names: UsersRoles.roles_names,
         username: UsersRoles.username,
    
@@ -32,11 +34,12 @@ export const fetchUsers_Roles= createAsyncThunk("users_roles/fetchusers_roles", 
   });
 
 
-  export const fetchRolesPermission = createAsyncThunk(
+ 
+  export const featchUsers_RolesById = createAsyncThunk(
     "role_per/fetchRole_per",
     async (id, { rejectWithValue }) => {
       try {
-        const response = await fetch(`http://localhost:5000/roles_permissions/${id.toString()}`, {
+        const response = await fetch(`http://localhost:5000/fetchusers_roles/${id}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -65,6 +68,7 @@ export const fetchUsers_Roles= createAsyncThunk("users_roles/fetchusers_roles", 
   );
 
 
+
   const Featch_Users_Roles_Slice = createSlice({
     name: "Featch_Users_Roles_SliceStore",
     initialState,
@@ -85,20 +89,20 @@ export const fetchUsers_Roles= createAsyncThunk("users_roles/fetchusers_roles", 
     },
   });
   
-  const FetchRolesPermissionSlice = createSlice({
+  const FeatchUsersRolesByIdSlice = createSlice({
     name: "FetchRolse_perStore",
     initialState,
   
     extraReducers: {
-      [fetchRolesPermission.pending]: (state, action) => {
+      [featchUsers_RolesById.pending]: (state, action) => {
         state.loading = true;
         state.error = null;
       },
-      [fetchRolesPermission.fulfilled]: (state, action) => {
+      [featchUsers_RolesById.fulfilled]: (state, action) => {
         state.loading = false;
         state.RoleInfo = action.payload;
       },
-      [fetchRolesPermission.rejected]: (state, action) => {
+      [featchUsers_RolesById.rejected]: (state, action) => {
         state.loading = false;
         if (action.payload === "INVALID_ROLE") {
           state.error = "Cannot fech permission - permission does not exist or unauthorized.";
@@ -111,4 +115,4 @@ export const fetchUsers_Roles= createAsyncThunk("users_roles/fetchusers_roles", 
   });
 
   export default Featch_Users_Roles_Slice.reducer
-  export const fetchRoleReducer = FetchRolesPermissionSlice.reducer;
+  export const fetchRoleReducer = FeatchUsersRolesByIdSlice.reducer;

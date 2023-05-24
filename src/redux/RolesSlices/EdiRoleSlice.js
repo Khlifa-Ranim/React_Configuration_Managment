@@ -1,49 +1,41 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
-
-
-
-
-// export const editRole = createAsyncThunk("role/editRole", async (id) => {
-//   const config = {
-//     headers: {
-//       "Content-Type": "application/json",
-//       Authorization: `Bearer ${localStorage.getItem("token")}`,
-//     },
-//   };
-//   console.log("Updating Role..."); // <-- add this line to log when the role is being updated
-
-//   const response = await axios.put(`http://localhost:5000/role/${id}`, config);
-//   console.log("Role updated:", response.data); // <-- add this line to log the updated role data
-
-//   return {
-//     id: response.data.id,
-//     name: response.data.name,
-//     description: response.data.description,
-//   };
-// });
-
-
-
+import jwt_decode from "jwt-decode";
 
 export const editRole = createAsyncThunk(
   "role/editRole",
   async (updatedRole, { rejectWithValue }) => {
     try {
-      const response = await fetch(`http://localhost:5000/role/${updatedRole.id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify(updatedRole),
-      });
+      const response = await fetch(
+        `http://localhost:5000/role/${updatedRole.id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify(updatedRole),
+        }
+      );
 
       const data = await response.json();
-      
+
       if (!response.ok) {
         return rejectWithValue(data.error);
       }
+
+      // ADD LOG
+      const log = await fetch("http://localhost:5000/logs", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({
+          action: `${
+            jwt_decode(localStorage.getItem("token")).username
+          } Updated Role with Name :  ${updatedRole.name}`,
+        }),
+      });
 
       return data;
     } catch (error) {
@@ -52,10 +44,9 @@ export const editRole = createAsyncThunk(
   }
 );
 
-
 const RoleSlice = createSlice({
   name: "editRolsStore",
-  initialState : {
+  initialState: {
     isLoading: false,
     Roles: [],
     error: "",
@@ -67,20 +58,18 @@ const RoleSlice = createSlice({
     },
     [editRole.fulfilled]: (state, action) => {
       state.isLoading = false;
-      state.roles.map(role=>{
-    if(role.id==action.payload.id){
-      role.name=action.payload.name;
-      role.description=action.payload.description
-    }
-      })
-      
+      state.roles.map((role) => {
+        if (role.id == action.payload.id) {
+          role.name = action.payload.name;
+          role.description = action.payload.description;
+        }
+      });
     },
     [editRole.rejected]: (state, action) => {
       state.isLoading = false;
       state.error = action.payload;
     },
-  }
-  
+  },
 });
 
-export default RoleSlice.reducer
+export default RoleSlice.reducer;

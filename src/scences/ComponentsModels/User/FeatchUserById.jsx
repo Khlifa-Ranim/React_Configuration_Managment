@@ -25,7 +25,7 @@ function FetchPermissionById() {
 
 
 
-  const { username, type_id,role_id } = user;
+  const { username, USER_TYPE,roles } = user;
 
   return (
     <div  className="app">
@@ -37,9 +37,26 @@ function FetchPermissionById() {
     <div className="InputContainer">
      {user.loading && <div>Chargement.....</div>}
 
-      <p>username: {username}</p>
-      <p>type_id: {type_id}</p>
-      <p>role_id: {role_id}</p>
+      <p style={{ color: "#ff347f"}}>username: </p> {username}
+      <p style={{ color: "#ff347f"}}>USER_TYPE: </p>{USER_TYPE}
+      <p style={{ color: "#ff347f"}}>roles:</p>
+
+      <ul style={{ listStyle: "none", paddingLeft: "1em" }}>
+                        {user.roles.map((name, index) => (
+                          <li key={index} style={{ position: "relative" }}>
+                            <span
+                              style={{
+                                position: "absolute",
+                                left: "-1em",
+                                top: "0.2em",
+                              }}
+                            >
+                              &#8226;
+                            </span>
+                            {name}
+                          </li>
+                        ))}
+                      </ul>
 
     </div>
     </div>

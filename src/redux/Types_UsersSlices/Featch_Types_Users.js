@@ -33,11 +33,11 @@ export const fetchTypes_Users= createAsyncThunk("Types_Users/fetchTypes_Users", 
   });
 
 
-  export const fetchRolesPermission = createAsyncThunk(
-    "role_per/fetchRole_per",
+  export const featchTypeById = createAsyncThunk(
+    "profile/fetchprofile",
     async (id, { rejectWithValue }) => {
       try {
-        const response = await fetch(`http://localhost:5000/roles_permissions/${id.toString()}`, {
+        const response = await fetch(`http://localhost:5000/profile/${id}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -47,7 +47,7 @@ export const fetchTypes_Users= createAsyncThunk("Types_Users/fetchTypes_Users", 
         });
   
         if (response.status === 200) {
-          return "role deleted successfully";
+          return "featchTypeById deleted successfully";
         } else if (response.status === 202) {
           return "Nothing deleted";
         } else if (response.status === 401) {
@@ -63,7 +63,7 @@ export const fetchTypes_Users= createAsyncThunk("Types_Users/fetchTypes_Users", 
         return rejectWithValue(error.message);
       }
     }
-  );
+  );  
 
 
   const Featch_Types_Users_Slice = createSlice({
@@ -86,20 +86,20 @@ export const fetchTypes_Users= createAsyncThunk("Types_Users/fetchTypes_Users", 
     },
   });
   
-  const FetchRolesPermissionSlice = createSlice({
+  const FetchTypesSlice = createSlice({
     name: "FetchRolse_perStore",
     initialState,
   
     extraReducers: {
-      [fetchRolesPermission.pending]: (state, action) => {
+      [featchTypeById.pending]: (state, action) => {
         state.loading = true;
         state.error = null;
       },
-      [fetchRolesPermission.fulfilled]: (state, action) => {
+      [featchTypeById.fulfilled]: (state, action) => {
         state.loading = false;
         state.RoleInfo = action.payload;
       },
-      [fetchRolesPermission.rejected]: (state, action) => {
+      [featchTypeById.rejected]: (state, action) => {
         state.loading = false;
         if (action.payload === "INVALID_ROLE") {
           state.error = "Cannot fech permission - permission does not exist or unauthorized.";
@@ -112,4 +112,4 @@ export const fetchTypes_Users= createAsyncThunk("Types_Users/fetchTypes_Users", 
   });
 
   export default Featch_Types_Users_Slice.reducer
-  export const fetchRoleReducer = FetchRolesPermissionSlice.reducer;
+  export const fetchRoleReducer = FetchTypesSlice.reducer;

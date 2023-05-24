@@ -14,8 +14,8 @@ import { useNavigate } from "react-router-dom";
 
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchTypes_Users} from "../../../redux/Types_UsersSlices/Featch_Types_Users";
-import { deleteTypes } from "../../../redux/Types_UsersSlices/DeleteTypesUsers";
+import { fetchTypes_Users,featchTypeById} from "../../../redux/Types_UsersSlices/Featch_Types_Users";
+import {deleteTypes} from "../../../redux/Types_UsersSlices/DeleteTypesUsers"
 
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -28,8 +28,8 @@ const TypesUsers = () => {
 
   const dispatch = useDispatch();
   const TypesUsers = useSelector((state) => state.Featch_Types_Users_SliceStore);
-  console.log("TypesRoles:", TypesUsers);
   const Tab_Types_Users = TypesUsers.storeTypesUsers;
+  console.log("Tab_Types_Users:", TypesUsers);
 
 
   const notify = () => {
@@ -43,14 +43,16 @@ const TypesUsers = () => {
   console.log(Tab_Types_Users); // <-- add this line to check the value of user.users
   
   
-  // const fetchPermissionn = (id, roles_permissions) => {
-  //   console.log("fetch one Role active");
-  //   console.log("roles_permissions:", roles_permissions); // add this line to check the value of roles_permissions
-  //   const selectedPermission = roles_permissions.find((item) => item.permission_names);
-  //   console.log("selectedPermission", selectedPermission);
-  //   // dispatch(fetchRolesPermission(id));
-  //   navigate(`/FetchRolesPermissionById/${id}`);
-  // };
+  const fetchType = (id) => {
+    console.log("fetch one Type User active");
+    console.log("roles_permissions:", Tab_Types_Users); // add this line to check the value of roles_permissions
+    const selectedPermission = Tab_Types_Users.find((item) => item.id === id);
+    console.log("selectedType", selectedPermission);
+    dispatch(featchTypeById(id));
+    navigate(`/FetchTypeById/${id}`);
+  };
+
+
 
 
   const getRowId = (row, index) => {
@@ -111,14 +113,14 @@ console.log(filteredRows);
         
         return (
           <>
-               {/* <Button
+               <Button
               variant="contained"
               color="secondary"
-              onClick={() => fetchPermissionn(row.id)}
+              onClick={() => fetchType(row.id)}
               style={{ marginRight: "10px", backgroundColor: "#a8e6cf" }} // add margin-right inline style
             >
               Read
-            </Button> */}
+            </Button>
 
             <Button
               variant="contained"
